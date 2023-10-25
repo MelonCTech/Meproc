@@ -1,4 +1,4 @@
-#include "@validator.m"
+#include "@/validator.m"
 
 /*
 [
@@ -14,6 +14,8 @@
     "cmd": "echo 'aaa'",
     "type": "restart",
     "replica": 3
+    "retry": 3,
+    "interval": 3,
   }
 ]
 */
@@ -28,23 +30,19 @@ Proc {
             ['field': 'cmd', 'type': 'string', 'required': true],
             ['field': 'type', 'type': 'string', 'required': true, 'in': ['oneshot', 'regular']],
             ['field': 'cron', 'type': 'string', 'required': false],
-            ['field': 'replica', 'type': 'int', 'required': false, 'default': 0],
+            ['field': 'replica', 'type': 'int', 'required': true, 'default': 0],
+            ['field': 'retry', 'type': 'int', 'required': true, 'default': 3],
+            ['field': 'interval', 'type': 'int', 'required': true, 'default': 3],
         ];
     }
 
-    @proc() {
-        if (R['method'] == 'GET') {
-            return this.list();
-        } else if (R['method'] == 'POST') {
-            return this.update();
-        } else if (R['method'] == 'PUT') {
-            return this.create();
-        } else if (R['method'] == 'DELETE') {
-            return this.remove();
-        } else {
-            R['code'] = 400;
-            return '';
-        }
+    @acl() {
+        return [
+            'start': true,
+            'restart': true,
+            'list': true,
+            'stop': true,
+        ];
     }
 
     @get_args() {
@@ -75,11 +73,19 @@ Proc {
 
     @list() {
         R['headers']['Content-Type'] = 'application/json';
+        if (R['method'] != 'GET') {
+            R['code'] = 403;
+            return J.encode(['code': 403, 'msg': 'Method not allowed']);
+        } fi
         return J.encode(['code': 200, 'msg': 'OK', 'data': S.exec()]);
     }
 
-    @create() {
+    @start() {
         R['headers']['Content-Type'] = 'application/json';
+        if (R['method'] != 'POST') {
+            R['code'] = 403;
+            return J.encode(['code': 403, 'msg': 'Method not allowed']);
+        } fi
         body = this.get_json_body();
         if (!body) {
             return J.encode(['code': 400, 'msg': 'JSON body is required']);
@@ -88,8 +94,12 @@ Proc {
         return J.encode(['code': 200, 'msg': 'OK']);
     }
 
-    @remove() {
+    @stop() {
         R['headers']['Content-Type'] = 'application/json';
+        if (R['method'] != 'GET') {
+            R['code'] = 403;
+            return J.encode(['code': 403, 'msg': 'Method not allowed']);
+        } fi
         args = this.get_args();
         if (!args || !(S.has(args, 'id'))) {
             return J.encode(['code': 400, 'msg': 'id is required']);
@@ -98,7 +108,12 @@ Proc {
         return J.encode(['code': 200, 'msg': 'OK']);
     }
 
-    @update() {
-        //@@@@@@@@@@@@@@@@@@
+    @restart() {
+        R['headers']['Content-Type'] = 'application/json';
+        if (R['method'] != 'GET') {
+            R['code'] = 403;
+            return J.encode(['code': 403, 'msg': 'Method not allowed']);
+        } fi
+        //@@@@@@@@@@@@@@@@@@ stop and start
     }
 }
