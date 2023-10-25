@@ -12,9 +12,8 @@ if (!listenfd) {
     return;
 } fi
 
-for (i = 0; i < 2; ++i) {
-    Eval('worker.m', i);
-}
+Eval('worker.m');
+
 while (1) {
     fd = net.tcp_accept(listenfd);
     if (!(sys.is_int(fd)))

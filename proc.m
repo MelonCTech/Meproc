@@ -1,3 +1,5 @@
+#include "@validator.m"
+
 /*
 [
   {
@@ -20,6 +22,16 @@ S = Import('sys');
 Str = Import('str');
 
 Proc {
+    @rules() {
+        return [
+            ['field': 'name', 'type': 'string', 'required': true],
+            ['field': 'cmd', 'type': 'string', 'required': true],
+            ['field': 'type', 'type': 'string', 'required': true, 'in': ['oneshot', 'regular']],
+            ['field': 'cron', 'type': 'string', 'required': false],
+            ['field': 'replica', 'type': 'int', 'required': false, 'default': 0],
+        ];
+    }
+
     @proc() {
         if (R['method'] == 'GET') {
             return this.list();
