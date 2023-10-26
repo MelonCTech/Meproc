@@ -27,7 +27,7 @@ Proc {
                 ['field': 'name', 'type': 'string', 'required': true],
                 ['field': 'cmd', 'type': 'string', 'required': true],
                 ['field': 'type', 'type': 'string', 'required': true, 'in': ['oneshot', 'regular']],
-	        ['field': 'cron', 'type': 'string', 'required': true, 'default': '* * * * *'],
+	        ['field': 'cron', 'type': 'string', 'required': false, 'default': '* * * * *'],
                 ['field': 'replica', 'type': 'int', 'required': true, 'default': 0],
                 ['field': 'retry', 'type': 'int', 'required': true, 'default': 3],
                 ['field': 'interval', 'type': 'int', 'required': true, 'default': 3],
