@@ -5,17 +5,12 @@
   {
     "name": "lstest",
     "cmd": "ls /",
-    "type": "once",
+    "type": "oneshot",
     "cron": "* * * * *",
-    "replica": 3
-  },
-  {
-    "name": "echotest",
-    "cmd": "echo 'aaa'",
-    "type": "restart",
-    "replica": 3
+    "replica": 3,
     "retry": 3,
     "interval": 3,
+    "deps": []
   }
 ]
 */
@@ -23,25 +18,30 @@ J = Import('json');
 S = Import('sys');
 Str = Import('str');
 
+Programs = [];
+
 Proc {
     @rules() {
         return [
-            ['field': 'name', 'type': 'string', 'required': true],
-            ['field': 'cmd', 'type': 'string', 'required': true],
-            ['field': 'type', 'type': 'string', 'required': true, 'in': ['oneshot', 'regular']],
-            ['field': 'cron', 'type': 'string', 'required': false],
-            ['field': 'replica', 'type': 'int', 'required': true, 'default': 0],
-            ['field': 'retry', 'type': 'int', 'required': true, 'default': 3],
-            ['field': 'interval', 'type': 'int', 'required': true, 'default': 3],
+            'body': [
+                ['field': 'name', 'type': 'string', 'required': true],
+                ['field': 'cmd', 'type': 'string', 'required': true],
+                ['field': 'type', 'type': 'string', 'required': true, 'in': ['oneshot', 'regular']],
+	        ['field': 'cron', 'type': 'string', 'required': true, 'default': '* * * * *'],
+                ['field': 'replica', 'type': 'int', 'required': true, 'default': 0],
+                ['field': 'retry', 'type': 'int', 'required': true, 'default': 3],
+                ['field': 'interval', 'type': 'int', 'required': true, 'default': 3],
+                ['field': 'deps', 'type': 'array', 'required': false, 'element_type': 'string'],
+            ],
+            'args': [
+                ['field': 'name', 'type': 'string', 'required': true],
+            ],
         ];
     }
 
     @acl() {
         return [
-            'start': true,
-            'restart': true,
-            'list': true,
-            'stop': true,
+            'index': true,
         ];
     }
 
@@ -71,49 +71,90 @@ Proc {
         return J.decode(R['body']);
     }
 
-    @list() {
+    @index() {
+        method = R['method'];
         R['headers']['Content-Type'] = 'application/json';
-        if (R['method'] != 'GET') {
-            R['code'] = 403;
-            return J.encode(['code': 403, 'msg': 'Method not allowed']);
+
+        if (method == 'GET') {
+            return this.list();
+        } else if (method == 'POST') {
+            return this.restart();
+        } else if (method == 'PUT') {
+            return this.start();
+        } else if (method == 'DELETE') {
+            return this.stop();
         } fi
+        R['code'] = 405;
+        return J.encode(['code': 405, 'msg': 'Method not allowed']);
+    }
+
+    @list() {
         return J.encode(['code': 200, 'msg': 'OK', 'data': S.exec()]);
     }
 
     @start() {
-        R['headers']['Content-Type'] = 'application/json';
-        if (R['method'] != 'POST') {
-            R['code'] = 403;
-            return J.encode(['code': 403, 'msg': 'Method not allowed']);
-        } fi
         body = this.get_json_body();
         if (!body) {
+            R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'JSON body is required']);
         } fi
-        //@@@@@@@@@@@@@@@@@@
+        if (!(Validate(this.rules()['body'], body))) {
+            R['code'] = 400;
+            return J.encode(['code': 400, 'msg': 'Invalid JSON field']);
+        } fi
+        if (S.has(Programs, body['name']) && !(S.is_nil(Programs[body['name']]))) {
+            R['code'] = 403;
+            return J.encode(['code': 403, 'msg': 'Program exists, please stop it at first']);
+        } fi
+        if (!(this.do_start(body))) {
+            R['code'] = 400;
+            return J.encode(['code': 400, 'msg': 'Start failed']);
+        } fi
+        Programs[body['name']] = body;
         return J.encode(['code': 200, 'msg': 'OK']);
     }
 
     @stop() {
-        R['headers']['Content-Type'] = 'application/json';
-        if (R['method'] != 'GET') {
-            R['code'] = 403;
-            return J.encode(['code': 403, 'msg': 'Method not allowed']);
-        } fi
         args = this.get_args();
-        if (!args || !(S.has(args, 'id'))) {
-            return J.encode(['code': 400, 'msg': 'id is required']);
+        if (!(Validate(this.rules()['args'], args))) {
+            R['code'] = 400;
+            return J.encode(['code': 400, 'msg': 'name is required']);
         } fi
-        //@@@@@@@@@@@@@@@@@@
+        name = args['name'];
+        if (!(S.has(Programs, name)) || S.is_nil(Programs[name])) {
+            R['code'] = 403;
+            return J.encode(['code': 403, 'msg': 'Program not exists, please start it at first']);
+        } fi
+        this.do_stop(name);
+        Programs[name] = nil;
         return J.encode(['code': 200, 'msg': 'OK']);
     }
 
     @restart() {
-        R['headers']['Content-Type'] = 'application/json';
-        if (R['method'] != 'GET') {
-            R['code'] = 403;
-            return J.encode(['code': 403, 'msg': 'Method not allowed']);
+        args = this.get_args();
+        if (!(Validate(this.rules()['args'], args))) {
+            R['code'] = 400;
+            return J.encode(['code': 400, 'msg': 'name is required']);
         } fi
-        //@@@@@@@@@@@@@@@@@@ stop and start
+        name = args['name'];
+        if (!(S.has(Programs, name)) || S.is_nil(Programs[name])) {
+            R['code'] = 403;
+            return J.encode(['code': 403, 'msg': 'Program not exists, please start it at first']);
+        } fi
+        this.do_stop(name);
+        if (!this.do_start(Programs[name])) {
+            R['code'] = 400;
+            return J.encode(['code': 400, 'msg': 'Start failed']);
+        } fi
+        return J.encode(['code': 200, 'msg': 'OK']);
+    }
+
+    @do_start(prog) {
+        //@@@@@@@@@@@@@@@@@@
+        return true;
+    }
+
+    @do_stop(name) {
+        //@@@@@@@@@@@@@@@@@@
     }
 }

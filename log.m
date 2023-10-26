@@ -47,7 +47,7 @@ Log_level = 'debug';
 
     f = $F;
     if (f.open(Log_path, 'a+') != false) {
-        f.write(l + s);
+        f.write(l + s + "\n");
         f.close();
     } fi
     Sys.print(lc + s);
