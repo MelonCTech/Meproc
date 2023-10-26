@@ -1,19 +1,5 @@
 #include "@/validator.m"
 
-/*
-[
-  {
-    "name": "lstest",
-    "cmd": "ls /",
-    "type": "oneshot",
-    "cron": "* * * * *",
-    "replica": 3,
-    "retry": 3,
-    "interval": 3,
-    "deps": []
-  }
-]
-*/
 J = Import('json');
 S = Import('sys');
 Str = Import('str');
@@ -150,11 +136,34 @@ Proc {
     }
 
     @do_start(prog) {
-        //@@@@@@@@@@@@@@@@@@
+        /*
+        [
+          {
+            "name": "lstest",
+            "cmd": "ls /",
+            "type": "oneshot",
+            "cron": "* * * * *",
+            "replica": 3,
+            "retry": 3,
+            "interval": 3,
+            "deps": []
+          }
+        ]
+        */
+        n = prog['replica'];
+        name = prog['name'];
+        data = J.encode(prog);
+        for (i = 0; i < n; ++i) {
+            Eval('task.m', data, false, name + ':' + i);
+        }
         return true;
     }
 
     @do_stop(name) {
-        //@@@@@@@@@@@@@@@@@@
+        prog = Programs[name];
+        n = prog['replica'];
+        for (i = 0; i < n; ++i) {
+            Kill(name + ':' + i);
+        }
     }
 }
