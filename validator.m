@@ -25,22 +25,24 @@ S = Import('sys');
                 continue;
             fi
         } else {
-            if (!(sys.has(data, r['field'])))
+            if (!(sys.has(data, r['field']))) {
                 return false;
-            fi
+            } fi
         }
 
         field = r['field'];
         type = r['type'];
-        if (sys.type(data[field]) != type)
-            return false;
-        fi
+        if (sys.type(data[field]) != type) {
+            if (!(S.is_nil(data[field])) || !(sys.has(r, 'default'))) {
+                return false;
+            } fi
+        } fi
 
         if (type == 'string') {
             if (sys.has(r, 'in')) {
-                if (!(in_array(r['in'], data[field])))
+                if (!(in_array(r['in'], data[field]))) {
                     return false;
-                fi
+                } fi
             } fi
             if (sys.has(r, 'default') && sys.is_nil(data[field]))
                 data[field] = r['default'];
@@ -50,14 +52,17 @@ S = Import('sys');
                 data[field] = r['default'];
             fi
         } else if (type == 'array') {
+            if (sys.has(r, 'default') && sys.is_nil(data[field]))
+                data[field] = r['default'];
+            fi
             if (sys.has(r, 'element_type')) {
                 elt_type = r['element_type'];
                 elts = data[field];
                 nelts = sys.size(elts);
                 for (idx = 0; idx < nelts; ++idx) {
-                    if (sys.type(elts[idx]) != elt_type)
+                    if (sys.type(elts[idx]) != elt_type) {
                         return false;
-                    fi
+                    } fi
                 }
             } fi
         } else {
