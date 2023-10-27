@@ -12,7 +12,7 @@ Proc {
             'body': [
                 ['field': 'name', 'type': 'string', 'required': true],
                 ['field': 'cmd', 'type': 'string', 'required': true],
-                ['field': 'type', 'type': 'string', 'required': true, 'in': ['oneshot', 'regular']],
+                ['field': 'type', 'type': 'string', 'required': true, 'in': ['once', 'daemon', 'cron']],
 	        ['field': 'cron', 'type': 'string', 'required': false, 'default': '* * * * *'],
                 ['field': 'replica', 'type': 'int', 'required': true, 'default': 0],
                 ['field': 'retry', 'type': 'int', 'required': true, 'default': 3],
@@ -75,7 +75,10 @@ Proc {
     }
 
     @list() {
-        return J.encode(['code': 200, 'msg': 'OK', 'data': S.exec()]);
+        return J.encode(['code': 200, 'msg': 'OK', 'data': [
+            'running': S.exec(),
+            'tasks': Programs,
+        ]]);
     }
 
     @start() {
