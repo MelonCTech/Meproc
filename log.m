@@ -23,7 +23,8 @@ Log_level = 'debug';
 @Log(level, s)
 {
     map = [
-        'debug': 1,
+        'debug': 0,
+        'info': 1,
         'warn': 2,
         'error': 3,
     ];
@@ -36,7 +37,10 @@ Log_level = 'debug';
 
     if (level == 'debug') {
         l = '[DEBUG] ' + tm;
-        lc = "\e[32m" + tm + " [DEBUG]\e[0m: ";
+        lc = "\e[36m" + tm + " [DEBUG]\e[0m: ";
+    } else if (level == 'info') {
+        l = '[INFO] ' + tm;
+        lc = "\e[32m" + tm + " [INFO]\e[0m: ";
     } else if (level == 'warn') {
         l = '[WARN] ' + tm;
         lc = "\e[33m" + tm + " [WARN]\e[0m: ";
@@ -60,6 +64,7 @@ Log_path_set(Conf['log_path']);
  * Examples:
  *  Log_level_set('warn');
  *  Log('debug', "abc");
+ *  Log('info', "abc");
  *  Log('warn', "abc");
  *  Log('error', "abc");
  */

@@ -4,13 +4,13 @@ net = Import('net');
 mq = Import('mq');
 sys = Import('sys');
 
-Log('debug', "Listen: " + Conf['ip'] + ':' + Conf['port']);
-
 listenfd = net.tcp_listen('127.0.0.1', '1234');
 if (!listenfd) {
     Log('error', "Listen failed");
     return;
 } fi
+
+Log('info', "Listen: " + Conf['ip'] + ':' + Conf['port']);
 
 Eval('http.m');
 
@@ -19,5 +19,5 @@ while (1) {
     if (!(sys.is_int(fd)))
         continue;
     fi
-    mq.send('test', fd);
+    mq.send('accept', fd);
 }

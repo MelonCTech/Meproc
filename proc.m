@@ -15,7 +15,6 @@ Proc {
                 ['field': 'type', 'type': 'string', 'required': true, 'in': ['once', 'daemon', 'cron']],
 	        ['field': 'cron', 'type': 'string', 'required': false, 'default': '* * * * *'],
                 ['field': 'replica', 'type': 'int', 'required': true, 'default': 0],
-                ['field': 'retry', 'type': 'int', 'required': true, 'default': 3],
                 ['field': 'interval', 'type': 'int', 'required': true, 'default': 3],
                 ['field': 'deps', 'type': 'array', 'required': false, 'element_type': 'string'],
             ],
@@ -147,7 +146,6 @@ Proc {
             "type": "oneshot",
             "cron": "* * * * *",
             "replica": 3,
-            "retry": 3,
             "interval": 3,
             "deps": []
           }
@@ -155,9 +153,13 @@ Proc {
         */
         n = prog['replica'];
         name = prog['name'];
-        data = J.encode(prog);
+        prog['running'] = n;
         for (i = 0; i < n; ++i) {
-            Eval('task.m', data, false, name + ':' + i);
+            alias = name + ':' + i;
+            Eval('task.m', J.encode([
+                'conf': prog,
+                'alias': alias,
+            ]), false, alias);
         }
         return true;
     }

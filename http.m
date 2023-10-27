@@ -7,16 +7,34 @@ http = Import('http');
 str = Import('str');
 
 while (1) {
-    fd = mq.recv('test');
-    buf = '';
-    o = nil;
+    data = mq.recv('http', 1000);
+    if (!(sys.is_nil(data))) {
+        if (--(Programs[data]['running']) <= 0)
+            Programs[data] = nil;
+        fi
+    } fi
+
+    if (!timeout) {
+        fd = mq.recv('accept', 1000);
+        if (sys.is_nil(fd))
+            continue;
+        fi
+        buf = '';
+        o = nil;
+        timeout = false;
+    } fi
 
     while (1) {
-        ret = net.tcp_recv(fd);
+        ret = net.tcp_recv(fd, 1);
         if (sys.is_bool(ret)) {
+            timeout = false;
+            break;
+        } else if (sys.is_nil(ret)) {
+            timeout = true;
             break;
         } fi
 
+        timeout = false;
         buf += ret;
         if (buf) {
             R = http.parse(buf);
@@ -57,6 +75,10 @@ while (1) {
             break;
         } fi
     }
+
+    if (timeout) {
+        continue;
+    } fi
 
     net.tcp_close(fd);
 }
