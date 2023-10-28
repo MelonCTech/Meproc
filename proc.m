@@ -165,6 +165,7 @@ Proc {
         n = prog['replica'];
         name = prog['name'];
         prog['running'] = n;
+        prog['last_time'] = S.time();
         for (i = 0; i < n; ++i) {
             alias = name + ':' + i;
             Eval('task.m', J.encode([
