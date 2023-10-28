@@ -100,7 +100,7 @@ Proc {
             R['code'] = 403;
             return J.encode(['code': 403, 'msg': 'Program exists, please stop it at first']);
         } fi
-        if (!(this.do_start(body))) {
+        if (!(Start(body))) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Start failed']);
         } fi
@@ -119,7 +119,7 @@ Proc {
             R['code'] = 403;
             return J.encode(['code': 403, 'msg': 'Program not exists, please start it at first']);
         } fi
-        this.do_stop(name);
+        Stop(name);
         Programs[name] = nil;
         return J.encode(['code': 200, 'msg': 'OK']);
     }
@@ -135,105 +135,105 @@ Proc {
             R['code'] = 403;
             return J.encode(['code': 403, 'msg': 'Program not exists, please start it at first']);
         } fi
-        this.do_stop(name);
+        Stop(name);
         S.is_bool(Programs[name]['cron']) && Programs[name]['cron'] = nil;
-        if (!(this.do_start(Programs[name]))) {
+        if (!(Start(Programs[name]))) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Start failed']);
         } fi
         return J.encode(['code': 200, 'msg': 'OK']);
     }
+}
 
-    @do_start(prog) {
-        /*
-        [
-          {
-            "name": "lstest",
-            "cmd": "ls /",
-            "type": "once",
-            "cron": "* * * * *",
-            "replica": 3,
-            "interval": 3,
-            "deps": []
-          }
-        ]
-        */
-        if (this.is_dep_running(prog)) {
-            !(prog['cron']) && prog['cron'] = true;
-            return this.do_cron(prog);
-        } fi
-        n = prog['replica'];
-        name = prog['name'];
-        prog['running'] = n;
-        prog['last_time'] = S.time();
-        for (i = 0; i < n; ++i) {
-            alias = name + ':' + i;
-            Eval('task.m', J.encode([
-                'conf': prog,
-                'alias': alias,
-            ]), false, alias);
-        }
-        return true;
+@Start(prog) {
+    /*
+    [
+      {
+        "name": "lstest",
+        "cmd": "ls /",
+        "type": "once",
+        "cron": "* * * * *",
+        "replica": 3,
+        "interval": 3,
+        "deps": []
+      }
+    ]
+    */
+    if (Is_dep_running(prog)) {
+        !(prog['cron']) && prog['cron'] = true;
+        return Cron(prog);
+    } fi
+    n = prog['replica'];
+    name = prog['name'];
+    prog['running'] = n;
+    prog['last_time'] = S.time();
+    for (i = 0; i < n; ++i) {
+        alias = name + ':' + i;
+        Eval('task.m', J.encode([
+            'conf': prog,
+            'alias': alias,
+        ]), false, alias);
+    }
+    return true;
+}
+
+@Stop(name) {
+    prog = Programs[name];
+    if (Is_dep_running(prog))
+        return;
+    fi
+    n = prog['replica'];
+    for (i = 0; i < n; ++i) {
+        Kill(name + ':' + i);
+    }
+}
+
+@Fetch_deps(prog) {
+    ret = [];
+    chg = true;
+
+    n = S.size(prog['deps']);
+    for (i = 0; i < n; ++i) {
+        name = prog['deps'][i];
+        ret[name] = name;
     }
 
-    @do_stop(name) {
-        prog = Programs[name];
-        if (this.is_dep_running(prog))
-            return;
-        fi
-        n = prog['replica'];
+    while (chg) {
+        chg = false;
+        n = S.size(ret);
         for (i = 0; i < n; ++i) {
-            Kill(name + ':' + i);
-        }
-    }
-
-    @fetch_deps(prog) {
-        ret = [];
-        chg = true;
-
-        n = S.size(prog['deps']);
-        for (i = 0; i < n; ++i) {
-            name = prog['deps'][i];
-            ret[name] = name;
-        }
-
-        while (chg) {
-            chg = false;
-            n = S.size(ret);
-            for (i = 0; i < n; ++i) {
-                name = ret[i];
-                if (!(S.has(Programs, name)))
-                    continue;
-                fi
-                deps = Programs[name]['deps'];
-                m = S.size(deps);
-                for (j = 0; j < m; ++j) {
-                    if (!(S.has(ret, deps[j]))) {
-                        ret[deps[j]] = deps[j];
-                        chg = true;
-                    } fi
-                }
+            name = ret[i];
+            if (!(S.has(Programs, name)))
+                continue;
+            fi
+            deps = Programs[name]['deps'];
+            m = S.size(deps);
+            for (j = 0; j < m; ++j) {
+                if (!(S.has(ret, deps[j]))) {
+                    ret[deps[j]] = deps[j];
+                    chg = true;
+                } fi
             }
         }
-        return ret;
     }
+    return ret;
+}
 
-    @is_dep_running(prog) {
-        deps = this.fetch_deps(prog);
-        list = S.exec();
-        n = S.size(list);
-        for (i = 0; i < n; ++i) {
-            name = Str.slice(list[i]['alias'], ':')[0];
-            if (deps[name])
-                return true;
-            fi
-        }
-        return false;
+@Is_dep_running(prog) {
+    deps = Fetch_deps(prog);
+    list = S.exec();
+    n = S.size(list);
+    for (i = 0; i < n; ++i) {
+        name = Str.slice(list[i]['alias'], ':')[0];
+        if (deps[name])
+            return true;
+        fi
     }
+    return false;
+}
 
-    @do_cron(prog) {
-        //process cron @@@@@@@@@@@@@@@@@@@@@@@@
-	//prog['type'] can be all of three values@@@@@@@@@@@@
-        //prog['cron'] can be regular format or true@@@@@@@@@@@@@
-    }
+@Cron(prog) {
+    //process cron @@@@@@@@@@@@@@@@@@@@@@@@
+    //prog['type'] can be all of three values@@@@@@@@@@@@
+    //prog['cron'] can be regular format or true@@@@@@@@@@@@@
 }
