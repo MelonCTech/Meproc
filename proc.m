@@ -139,7 +139,7 @@ Proc {
         if (S.is_bool(Programs[name]['cron']))
             Programs[name]['cron'] = nil;
         fi
-        if (!this.do_start(Programs[name])) {
+        if (!(this.do_start(Programs[name]))) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Start failed']);
         } fi

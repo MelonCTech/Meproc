@@ -9,9 +9,7 @@ str = Import('str');
 while (1) {
     data = mq.recv('http', 1000);
     if (!(sys.is_nil(data))) {
-        if (Programs[data] && --(Programs[data]['running']) <= 0)
-            Programs[data] = nil;
-        fi
+        Programs[data] && --(Programs[data]['running']);
     } fi
 
     if (!timeout) {
