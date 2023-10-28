@@ -1,3 +1,4 @@
+#include "@/log.m"
 #include "@/validator.m"
 
 J = Import('json');
@@ -167,6 +168,7 @@ Proc {
     name = prog['name'];
     prog['running'] = n;
     prog['last_time'] = S.time();
+    Log('info', 'Task ' + prog['name'] + ' started');
     for (i = 0; i < n; ++i) {
         alias = name + ':' + i;
         Eval('task.m', J.encode([
@@ -183,6 +185,7 @@ Proc {
         return;
     fi
     n = prog['replica'];
+    Log('info', 'Task ' + prog['name'] + ' stopped');
     for (i = 0; i < n; ++i) {
         Kill(name + ':' + i);
     }
