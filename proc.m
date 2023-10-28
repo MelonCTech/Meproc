@@ -136,9 +136,7 @@ Proc {
             return J.encode(['code': 403, 'msg': 'Program not exists, please start it at first']);
         } fi
         this.do_stop(name);
-        if (S.is_bool(Programs[name]['cron']))
-            Programs[name]['cron'] = nil;
-        fi
+        S.is_bool(Programs[name]['cron']) && Programs[name]['cron'] = nil;
         if (!(this.do_start(Programs[name]))) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Start failed']);
@@ -161,9 +159,7 @@ Proc {
         ]
         */
         if (this.is_dep_running(prog)) {
-            if (!(S.has(prog, 'cron')))
-                prog['cron'] = true;
-            fi
+            !(prog['cron']) && prog['cron'] = true;
             return this.do_cron(prog);
         } fi
         n = prog['replica'];

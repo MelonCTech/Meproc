@@ -8,9 +8,7 @@ str = Import('str');
 
 while (1) {
     data = mq.recv('http', 1000);
-    if (!(sys.is_nil(data))) {
-        Programs[data] && --(Programs[data]['running']);
-    } fi
+    !(sys.is_nil(data)) && Programs[data] && --(Programs[data]['running']);
 
     if (!timeout) {
         fd = mq.recv('accept', 1000);

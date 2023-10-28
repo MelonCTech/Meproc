@@ -44,17 +44,11 @@ S = Import('sys');
                     return false;
                 } fi
             } fi
-            if (sys.has(r, 'default') && sys.is_nil(data[field]))
-                data[field] = r['default'];
-            fi
+            sys.has(r, 'default') && sys.is_nil(data[field]) && data[field] = r['default'];
         } else if (type == 'int') {
-            if (sys.has(r, 'default') && sys.is_nil(data[field]))
-                data[field] = r['default'];
-            fi
+            sys.has(r, 'default') && sys.is_nil(data[field]) && data[field] = r['default'];
         } else if (type == 'array') {
-            if (sys.has(r, 'default') && sys.is_nil(data[field]))
-                data[field] = r['default'];
-            fi
+            sys.has(r, 'default') && sys.is_nil(data[field]) && data[field] = r['default'];
             if (sys.has(r, 'element_type')) {
                 elt_type = r['element_type'];
                 elts = data[field];
