@@ -160,6 +160,8 @@ Proc {
       }
     ]
     */
+    now = S.time();
+    prog['start_time'] = now;
     if (Is_dep_running(prog)) {
         !(prog['cron']) && prog['cron'] = true;
         return Cron(prog);
@@ -167,7 +169,7 @@ Proc {
     n = prog['replica'];
     name = prog['name'];
     prog['running'] = n;
-    prog['last_time'] = S.time();
+    prog['last_time'] = now;
     Log('info', 'Task ' + prog['name'] + ' started');
     for (i = 0; i < n; ++i) {
         alias = name + ':' + i;
