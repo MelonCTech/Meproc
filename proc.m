@@ -194,13 +194,16 @@ Proc {
     }
 }
 
-@Fetch_deps(prog) {
+@Fetch_deps(prog, &set, in_set) {
     ret = [];
     chg = true;
 
     n = S.size(prog['deps']);
     for (i = 0; i < n; ++i) {
         name = prog['deps'][i];
+        if (in_set && (!(S.has(set, name)) || S.is_nil(set[name]))) {
+            continue;
+        } fi
         ret[name] = name;
     }
 
@@ -209,12 +212,16 @@ Proc {
         n = S.size(ret);
         for (i = 0; i < n; ++i) {
             name = ret[i];
-            if (!(S.has(Programs, name)))
+            if (!(S.has(set, name)) || S.is_nil(set[name]))
                 continue;
             fi
-            deps = Programs[name]['deps'];
+            deps = set[name]['deps'];
             m = S.size(deps);
             for (j = 0; j < m; ++j) {
+                if (in_set && (!(S.has(set, deps[j])) || S.is_nil(set[deps[j]]))) {
+                    continue;
+                } fi
+
                 if (!(S.has(ret, deps[j]))) {
                     ret[deps[j]] = deps[j];
                     chg = true;
@@ -231,10 +238,10 @@ Proc {
     n = S.size(list);
     for (i = 0; i < n; ++i) {
         name = Str.slice(list[i]['alias'], ':')[0];
-        if (!(S.has(Programs, name)) || !(Programs[name]))
+        if (!(S.has(Programs, name)) || !(Programs[name])) {
             Log('error', "Task [" + name + "] is running but not in Programs"); 
             continue;
-        fi
+        } fi
         ret[name] = Programs[name];
     }
     return ret;
@@ -242,7 +249,7 @@ Proc {
 
 @Is_dep_running(prog) {
     tasks = Get_running_tasks();
-    deps = Fetch_deps(prog);
+    deps = Fetch_deps(prog, Programs);
 
     n = S.size(deps);
     for (i = 0; i < n; ++i) {
@@ -254,10 +261,34 @@ Proc {
     return false;
 }
 
+@Get_immediate_tasks() {
+    tasks = [];
+    ret = [];
+    n = S.size(Programs);
+    for (i = 0; i < n; ++i) {
+        prog = Programs[i];
+        if (S.has(prog, 'cron') && prog['cron'] && S.is_bool(prog['cron'])) {
+            tasks[prog['name']] = prog;
+        } fi
+    }
+
+    n = S.size(tasks);
+    for (i = 0; i < n; ++i) {
+        t = tasks[i];
+        !(Fetch_deps(t, tasks, true)) && ret[t['name']] = t;
+    }
+
+    return ret;
+}
+
 @cron_job_process() {
     //process cron @@@@@@@@@@@@@@@@@@@@@@@@
     //prog['type'] can be all of three values@@@@@@@@@@@@
     //prog['cron'] can be regular format or true@@@@@@@@@@@@@
-    tasks = Get_running_tasks();
+    tasks = Get_immediate_tasks();
+    n = S.size(tasks);
+    for (i = 0; i < n; ++i) {
+        Start(tasks[i]);
+    }
 }
 
