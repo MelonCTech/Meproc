@@ -171,6 +171,7 @@ Proc {
     name = prog['name'];
     prog['running'] = n;
     prog['last_time'] = now;
+    S.has(prog, 'cron') && prog['cron'] && S.is_bool(prog['cron']) && prog['cron'] = nil;
     Log('info', 'Task ' + prog['name'] + ' started');
     for (i = 0; i < n; ++i) {
         alias = name + ':' + i;
