@@ -232,6 +232,7 @@ Proc {
     for (i = 0; i < n; ++i) {
         name = Str.slice(list[i]['alias'], ':')[0];
         if (!(S.has(Programs, name)) || !(Programs[name]))
+            Log('error', "Task [" + name + "] is running but not in Programs"); 
             continue;
         fi
         ret[name] = Programs[name];
