@@ -94,9 +94,15 @@ Proc {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Invalid JSON field']);
         } fi
-        if (S.has(body, 'cron') && !(S.cron(body['cron'], S.time()))) {
-            R['code'] = 400;
-            return J.encode(['code': 400, 'msg': 'Invalid cron format']);
+        if (S.has(body, 'cron')) {
+            if (body['type'] != 'cron') {
+                R['code'] = 400;
+                return J.encode(['code': 400, 'msg': "Type of cron job must be 'cron'"]);
+            } fi
+            if (!(S.cron(body['cron'], S.time()))) {
+                R['code'] = 400;
+                return J.encode(['code': 400, 'msg': 'Invalid cron format']);
+            } fi
         } fi
         if (S.has(Programs, body['name']) && !(S.is_nil(Programs[body['name']]))) {
             R['code'] = 403;
