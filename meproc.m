@@ -4,7 +4,7 @@ net = Import('net');
 mq = Import('mq');
 sys = Import('sys');
 
-listenfd = net.tcp_listen('127.0.0.1', '1234');
+listenfd = net.tcp_listen(Conf['ip'], Conf['port']);
 if (!listenfd) {
     Log('error', "Listen failed");
     return;
