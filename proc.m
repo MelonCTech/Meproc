@@ -6,6 +6,7 @@ S = Import('sys');
 Str = Import('str');
 
 Programs = [];
+Delta = 0;
 
 Proc {
     @rules() {
@@ -164,7 +165,7 @@ Proc {
     prog['start_time'] = now;
     if (Is_dep_running(prog)) {
         !(prog['cron']) && prog['cron'] = true;
-        return Cron(prog);
+        return true;
     } fi
     n = prog['replica'];
     name = prog['name'];
@@ -224,21 +225,38 @@ Proc {
     return ret;
 }
 
-@Is_dep_running(prog) {
-    deps = Fetch_deps(prog);
+@Get_running_tasks() {
+    ret = [];
     list = S.exec();
     n = S.size(list);
     for (i = 0; i < n; ++i) {
         name = Str.slice(list[i]['alias'], ':')[0];
-        if (deps[name])
+        if (!(S.has(Programs, name)) || !(Programs[name]))
+            continue;
+        fi
+        ret[name] = Programs[name];
+    }
+    return ret;
+}
+
+@Is_dep_running(prog) {
+    tasks = Get_running_tasks();
+    deps = Fetch_deps(prog);
+
+    n = S.size(deps);
+    for (i = 0; i < n; ++i) {
+        if (S.has(tasks, deps[i]))
             return true;
         fi
     }
+
     return false;
 }
 
-@Cron(prog) {
+@cron_job_process() {
     //process cron @@@@@@@@@@@@@@@@@@@@@@@@
     //prog['type'] can be all of three values@@@@@@@@@@@@
     //prog['cron'] can be regular format or true@@@@@@@@@@@@@
+    tasks = Get_running_tasks();
 }
+

@@ -10,6 +10,8 @@ while (1) {
     data = mq.recv('http', 1000);
     !(sys.is_nil(data)) && Programs[data] && --(Programs[data]['running']);
 
+    cron_job_process();
+
     if (!timeout) {
         fd = mq.recv('accept', 1000);
         if (sys.is_nil(fd))
