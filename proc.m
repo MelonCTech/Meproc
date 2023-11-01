@@ -90,6 +90,7 @@ Proc {
         } fi
         body['deps'];
         body['interval'];
+        body['next'] = nil;
         if (!(Validate(this.rules()['body'], body))) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Invalid JSON field']);
@@ -144,7 +145,6 @@ Proc {
             return J.encode(['code': 403, 'msg': 'Program not exists, please start it at first']);
         } fi
         Stop(name);
-        S.is_bool(Programs[name]['cron']) && Programs[name]['cron'] = nil;
         if (!(Start(Programs[name]))) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Start failed']);
@@ -170,14 +170,14 @@ Proc {
     now = S.time();
     prog['start_time'] = now;
     if (Is_dep_running(prog)) {
-        !(prog['cron']) && prog['cron'] = true;
+        prog['next'] = 0;
         return true;
     } fi
     n = prog['replica'];
     name = prog['name'];
     prog['running'] = n;
     prog['last_time'] = now;
-    S.has(prog, 'cron') && prog['cron'] && S.is_bool(prog['cron']) && prog['cron'] = nil;
+    prog['next'] = nil;
     Log('info', 'Task ' + prog['name'] + ' started');
     for (i = 0; i < n; ++i) {
         alias = name + ':' + i;
@@ -269,33 +269,33 @@ Proc {
 }
 
 @Get_immediate_tasks() {
-    tasks = [];
-    ret = [];
+    tasks = [
+        'run': [],
+        'all': [],
+    ];
     n = S.size(Programs);
     for (i = 0; i < n; ++i) {
         prog = Programs[i];
-        if (S.has(prog, 'cron') && prog['cron'] && S.is_bool(prog['cron'])) {
-            tasks[prog['name']] = prog;
+        if (prog && !(prog['next']) && !(S.is_nil(prog['next']))) {
+            tasks['all'][prog['name']] = prog;
         } fi
     }
 
-    n = S.size(tasks);
+    n = S.size(tasks['all']);
     for (i = 0; i < n; ++i) {
-        t = tasks[i];
-        !(Fetch_deps(t, tasks, true)) && ret[t['name']] = t;
+        t = tasks['all'][i];
+        !(Fetch_deps(t, tasks['all'], true)) && tasks['run'][t['name']] = t;
     }
 
-    return ret;
+    return tasks;
 }
 
 @cron_job_process() {
     //process cron @@@@@@@@@@@@@@@@@@@@@@@@
-    //prog['type'] can be all of three values@@@@@@@@@@@@
-    //prog['cron'] can be regular format or true@@@@@@@@@@@@@
     tasks = Get_immediate_tasks();
-    n = S.size(tasks);
+    n = S.size(tasks['run']);
     for (i = 0; i < n; ++i) {
-        Start(tasks[i]);
+        Start(tasks['run'][i]);
     }
 }
 
