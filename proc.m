@@ -90,7 +90,8 @@ Proc {
         } fi
         body['deps'];
         body['interval'];
-        body['next'] = nil;
+        body['last_time'] = 0;
+        body['run_flag'] = false;
         if (!(Validate(this.rules()['body'], body))) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Invalid JSON field']);
@@ -109,7 +110,7 @@ Proc {
             R['code'] = 403;
             return J.encode(['code': 403, 'msg': 'Program exists, please stop it at first']);
         } fi
-        if (!(Start(body))) {
+        if (!(S.has(body, 'cron')) && !(Start(body))) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Start failed']);
         } fi
@@ -170,14 +171,14 @@ Proc {
     now = S.time();
     prog['start_time'] = now;
     if (Is_dep_running(prog)) {
-        prog['next'] = 0;
+        prog['run_flag'] = true;
         return true;
     } fi
     n = prog['replica'];
     name = prog['name'];
     prog['running'] = n;
     prog['last_time'] = now;
-    prog['next'] = nil;
+    prog['run_flag'] = false;
     Log('info', 'Task ' + prog['name'] + ' started');
     for (i = 0; i < n; ++i) {
         alias = name + ':' + i;
@@ -276,7 +277,7 @@ Proc {
     n = S.size(Programs);
     for (i = 0; i < n; ++i) {
         prog = Programs[i];
-        if (prog && !(prog['next']) && !(S.is_nil(prog['next']))) {
+        if (prog && prog['run_flag']) {
             tasks['all'][prog['name']] = prog;
         } fi
     }
@@ -287,15 +288,28 @@ Proc {
         !(Fetch_deps(t, tasks['all'], true)) && tasks['run'][t['name']] = t;
     }
 
-    return tasks;
+    return tasks['run'];
 }
 
 @cron_job_process() {
-    //process cron @@@@@@@@@@@@@@@@@@@@@@@@
-    tasks = Get_immediate_tasks();
-    n = S.size(tasks['run']);
+    im_tasks = Get_immediate_tasks();
+    n = S.size(im_tasks);
     for (i = 0; i < n; ++i) {
-        Start(tasks['run'][i]);
+        Start(im_tasks[i]);
     }
+
+    running_tasks = Get_running_tasks();
+    now = S.time() / 60 * 60;
+    n = S.size(Programs);
+    for (i = 0; i < n; ++i) {
+        prog = Programs[i];
+        if (prog && S.has(prog, 'cron') && (!(prog['run_flag'])) && !(S.has(running_tasks, prog['name'])) && (now - prog['last_time']) >= 60) {
+            next = S.cron(prog['cron'], now);
+            if (next < now + Delta + 16)
+                prog['run_flag'] = true;
+            fi
+        } fi
+    }
+    Delta = S.time() - now;
 }
 
