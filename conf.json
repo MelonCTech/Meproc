@@ -1,7 +1,0 @@
-{
-    "ip": "127.0.0.1",
-    "port": "1234",
-    "worker": 4,
-    "log_level": "debug",
-    "log_path": "/tmp/Meproc.log"
-}

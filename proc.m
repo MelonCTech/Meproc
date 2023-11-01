@@ -181,7 +181,7 @@ Proc {
     Log('info', 'Task ' + prog['name'] + ' started');
     for (i = 0; i < n; ++i) {
         alias = name + ':' + i;
-        Eval('task.m', J.encode([
+        Eval('@/task.m', J.encode([
             'conf': prog,
             'alias': alias,
         ]), false, alias);

@@ -12,7 +12,7 @@ if (!listenfd) {
 
 Log('info', "Listen: " + Conf['ip'] + ':' + Conf['port']);
 
-Eval('http.m');
+Eval('@/http.m');
 
 while (1) {
     fd = net.tcp_accept(listenfd);

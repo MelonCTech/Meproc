@@ -5,8 +5,6 @@
 Sys = Import('sys');
 F = Import('file');
 
-Conf_load('conf.json');
-
 Log_path = '/tmp/Meproc.log';
 Log_level = 'debug';
 
