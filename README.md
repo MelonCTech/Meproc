@@ -6,17 +6,23 @@ Meproc is a process management service that can start, stop, and restart specifi
 
 
 
-### Installation
+## Installation
 
 Meproc is written in [Melang](https://github.com/Water-Melon/Melang) language, which means that you need to install and only install Melang, then Meproc can be started up.
 
+You can pull the built docker image.
+
+```
+docker pull melonc/meproc
+```
 
 
-### Quick Start
+
+## Quick Start
 
 
 
-##### Start Meproc
+### Start Meproc
 
 ```bash
 melang meproc.m
@@ -28,7 +34,7 @@ The default IP is `127.0.0.1` and port is `8606`.
 
 
 
-##### Start process
+### Start process
 
 Here is a simple example.
 
@@ -70,7 +76,7 @@ This task will be executed every minute.
 
 
 
-##### Stop process
+### Stop process
 
 Let's stop out `sleep1` task.
 
@@ -80,7 +86,7 @@ curl -v -XDELETE http://127.1:8606/proc?name=sleep1
 
 
 
-##### Restart process
+### Restart process
 
 Let's restart task `sleep2`.
 
@@ -92,7 +98,7 @@ curl -v -XPOST http://127.1:8606/proc?name=sleep2
 
 
 
-##### List all tasks and processes
+### List all tasks and processes
 
 ```bash
 curl -v -XGET http://127.1:8606/proc
@@ -102,7 +108,7 @@ An HTTP response with a JSON body will be returned.
 
 
 
-##### Change configuration
+### Change configuration
 
 Configuration file is `conf.m`.
 
@@ -119,7 +125,7 @@ Conf = [
 
 
 
-### Example
+## Example
 
 We start up Meproc, and run the commands that given below:
 
@@ -177,7 +183,7 @@ We will see the output of Meproc like:
 
 
 
-### License
+## License
 
 [BSD-3-Clause License](https://github.com/Water-Melon/Melang/blob/master/LICENSE)
 
