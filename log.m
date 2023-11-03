@@ -1,6 +1,6 @@
 #if !M_LOG
 #define M_LOG
-#include "@/conf.m"
+#include "@/conf/conf.m"
 
 Sys = Import('sys');
 F = Import('file');
@@ -48,10 +48,12 @@ Log_level = 'debug';
     }
 
     f = $F;
-    if (f.open(Log_path, 'a+') != false) {
+    if (f.open(Log_path, 'a+')) {
         f.write(l + s + "\n");
         f.close();
-    } fi
+    } else {
+        Sys.print("Open log file [" + Log_path + "] failed, " + f.errmsg());
+    }
     Sys.print(lc + s);
 }
 

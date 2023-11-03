@@ -13,8 +13,17 @@ interval = conf['interval'];
 
 again:
 
-s.exec(cmd, 0, pid);
-Log('info', "Process " + pid + " (" + alias + ") exit");
+s.exec(cmd, -1, pid, conf['user'], conf['group']);
+
+msg = "Process " + pid + " (" + alias;
+if (conf['user'] || conf['group']) {
+    msg += " running as ";
+    conf['user'] && (msg += conf['user']);
+    msg += ':';
+    conf['group'] && (msg += conf['group']);
+} fi
+msg += ") exit";
+Log('info', msg);
 
 if (type == 'daemon') {
     s.msleep(interval);

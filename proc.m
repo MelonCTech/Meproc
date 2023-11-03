@@ -16,6 +16,8 @@ Proc {
                 ['field': 'cmd', 'type': 'string', 'required': true],
                 ['field': 'type', 'type': 'string', 'required': true, 'in': ['once', 'daemon', 'cron']],
 	        ['field': 'cron', 'type': 'string', 'required': false,],
+	        ['field': 'user', 'type': 'string', 'required': false,],
+	        ['field': 'group', 'type': 'string', 'required': false,],
                 ['field': 'replica', 'type': 'int', 'required': true, 'default': 0],
                 ['field': 'interval', 'type': 'int', 'required': false, 'default': 3],
                 ['field': 'deps', 'type': 'array', 'required': false, 'element_type': 'string', 'default': []],
@@ -154,7 +156,7 @@ Proc {
     }
 }
 
-@Start(prog) {
+@Start(&prog) {
     /*
     [
       {
@@ -179,7 +181,18 @@ Proc {
     prog['running'] = n;
     prog['last_time'] = now;
     prog['run_flag'] = false;
-    Log('info', 'Task ' + prog['name'] + ' started');
+
+    msg = 'Task ' + prog['name'];
+    if (prog['user'] || prog['group']) {
+        msg += " (as ";
+        prog['user'] && (msg += prog['user']);
+        msg += ':';
+        prog['group'] && (msg += prog['group']);
+        msg += ")";
+    } fi
+    msg += " started";
+    Log('info', msg);
+
     for (i = 0; i < n; ++i) {
         alias = name + ':' + i;
         Eval('@/task.m', J.encode([

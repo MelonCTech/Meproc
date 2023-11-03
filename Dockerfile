@@ -1,6 +1,6 @@
 FROM melonc/melon
-WORKDIR /root
+WORKDIR /opt
 RUN apt-get update && \
     apt-get -y install git && \
     git clone https://github.com/MelonCTech/Meproc.git
-CMD /usr/bin/melang /root/Meproc/meproc.m
+CMD /usr/bin/melang /opt/Meproc/meproc.m

@@ -39,7 +39,7 @@ The default IP is `127.0.0.1` and port is `8606`.
 Here is a simple example.
 
 ```bash
-curl -v -XPUT http://127.1:8606/proc -d '{"name": "sleep1", "cmd": "sleep 5", "type": "once", "replica": 2}'
+curl -v -XPUT http://127.1:8606/proc -d '{"name": "sleep1", "cmd": "sleep 5", "type": "once", "replica": 2, "user": "guest"}'
 ```
 
 Using a PUT HTTP request to start up a new process.
@@ -51,6 +51,7 @@ Using a PUT HTTP request to start up a new process.
 - `once` means this task will only be executed once even if it exits unexpectedly.
 - `daemon` means this task is a daemon, so if this process exits in any reason, it will be restarted.
 - `cron` means this task is a cron job, it will contain a field named `cron` in task JSON.
+- `user` indicates the user of the new process. Please make sure that Meproc has the permission to do this. `user` and `group` are NOT working on Windows.
 
 
 
@@ -110,7 +111,7 @@ An HTTP response with a JSON body will be returned.
 
 ### Change configuration
 
-Configuration file is `conf.m`.
+Configuration file is `conf/conf.m`.
 
 ```
 Conf = [
