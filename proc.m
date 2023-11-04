@@ -5,7 +5,7 @@ J = Import('json');
 S = Import('sys');
 Str = Import('str');
 
-Programs = [];
+Tasks = [];
 Delta = 0;
 
 Proc {
@@ -80,7 +80,7 @@ Proc {
     @list() {
         return J.encode(['code': 200, 'msg': 'OK', 'data': [
             'running': S.exec(),
-            'tasks': Programs,
+            'tasks': Tasks,
         ]]);
     }
 
@@ -108,7 +108,7 @@ Proc {
                 return J.encode(['code': 400, 'msg': 'Invalid cron format']);
             } fi
         } fi
-        if (S.has(Programs, body['name']) && !(S.is_nil(Programs[body['name']]))) {
+        if (S.has(Tasks, body['name']) && !(S.is_nil(Tasks[body['name']]))) {
             R['code'] = 403;
             return J.encode(['code': 403, 'msg': 'Program exists, please stop it at first']);
         } fi
@@ -116,7 +116,7 @@ Proc {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Start failed']);
         } fi
-        Programs[body['name']] = body;
+        Tasks[body['name']] = body;
         return J.encode(['code': 200, 'msg': 'OK']);
     }
 
@@ -127,12 +127,12 @@ Proc {
             return J.encode(['code': 400, 'msg': 'name is required']);
         } fi
         name = args['name'];
-        if (!(S.has(Programs, name)) || S.is_nil(Programs[name])) {
+        if (!(S.has(Tasks, name)) || S.is_nil(Tasks[name])) {
             R['code'] = 403;
             return J.encode(['code': 403, 'msg': 'Program not exists, please start it at first']);
         } fi
         Stop(name);
-        Programs[name] = nil;
+        Tasks[name] = nil;
         return J.encode(['code': 200, 'msg': 'OK']);
     }
 
@@ -143,12 +143,12 @@ Proc {
             return J.encode(['code': 400, 'msg': 'name is required']);
         } fi
         name = args['name'];
-        if (!(S.has(Programs, name)) || S.is_nil(Programs[name])) {
+        if (!(S.has(Tasks, name)) || S.is_nil(Tasks[name])) {
             R['code'] = 403;
             return J.encode(['code': 403, 'msg': 'Program not exists, please start it at first']);
         } fi
         Stop(name);
-        if (!(Start(Programs[name]))) {
+        if (!(Start(Tasks[name]))) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Start failed']);
         } fi
@@ -204,7 +204,7 @@ Proc {
 }
 
 @Stop(name) {
-    prog = Programs[name];
+    prog = Tasks[name];
     if (Is_dep_running(prog))
         return;
     fi
@@ -259,18 +259,18 @@ Proc {
     n = S.size(list);
     for (i = 0; i < n; ++i) {
         name = Str.slice(list[i]['alias'], ':')[0];
-        if (!(S.has(Programs, name)) || !(Programs[name])) {
-            Log('error', "Task [" + name + "] is running but not in Programs"); 
+        if (!(S.has(Tasks, name)) || !(Tasks[name])) {
+            Log('error', "Task [" + name + "] is running but not in Tasks"); 
             continue;
         } fi
-        ret[name] = Programs[name];
+        ret[name] = Tasks[name];
     }
     return ret;
 }
 
 @Is_dep_running(prog) {
     tasks = Get_running_tasks();
-    deps = Fetch_deps(prog, Programs);
+    deps = Fetch_deps(prog, Tasks);
 
     n = S.size(deps);
     for (i = 0; i < n; ++i) {
@@ -287,9 +287,9 @@ Proc {
         'run': [],
         'all': [],
     ];
-    n = S.size(Programs);
+    n = S.size(Tasks);
     for (i = 0; i < n; ++i) {
-        prog = Programs[i];
+        prog = Tasks[i];
         if (prog && prog['run_flag']) {
             tasks['all'][prog['name']] = prog;
         } fi
@@ -313,9 +313,9 @@ Proc {
 
     running_tasks = Get_running_tasks();
     now = S.time() / 60 * 60;
-    n = S.size(Programs);
+    n = S.size(Tasks);
     for (i = 0; i < n; ++i) {
-        prog = Programs[i];
+        prog = Tasks[i];
         if (prog && S.has(prog, 'cron') && (!(prog['run_flag'])) && !(S.has(running_tasks, prog['name'])) && (now - prog['last_time']) >= 60) {
             next = S.cron(prog['cron'], now);
             if (next < now + Delta + 16)

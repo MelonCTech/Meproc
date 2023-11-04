@@ -8,7 +8,7 @@ str = Import('str');
 
 while (1) {
     data = mq.recv('http', 1000);
-    !(sys.is_nil(data)) && Programs[data] && --(Programs[data]['running']);
+    !(sys.is_nil(data)) && Tasks[data] && --(Tasks[data]['running']);
 
     cron_job_process();
 

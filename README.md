@@ -1,8 +1,9 @@
-# Meproc
+<img src="https://raw.githubusercontent.com/MelonCTech/Meproc/master/docs/logo.png" style="width:500px;" />
 
 
+<br>
 
-Meproc is a process management service that can start, stop, and restart specified programs in a specified manner through an HTTP API.
+**Meproc** is a process management service that can start, stop, and restart specified programs in a specified manner through an HTTP API.
 
 
 
