@@ -5,6 +5,15 @@
 
 **Meproc** is a process management service that can start, stop, and restart specified programs in a specified manner through an HTTP API.
 
+Features:
+- Support Restful API to start, stop, restart process groups, and view currently running process groups
+- Support some simple dependencies between process groups
+- Support cron jobs
+- Support one-time tasks
+- Support setting execution users and user groups for processes
+- Support multiple platforms: Windows, Linux, MacOS, etc.
+- The project only needs to pre-install the Melang interpreter, and no more others need to be installed.
+
 
 
 ## Installation
