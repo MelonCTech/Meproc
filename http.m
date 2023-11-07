@@ -49,11 +49,9 @@ while (1) {
             err = false;
 
             uri = str.slice(R['uri'], '/');
-            uri && (ctlr = str.capitalize(uri[0]), o = $ctlr);
-            if (sys.is_nil(uri[1]))
-                action = 'index';
-            else
-                action = uri[1];
+            !uri[0] && uri[0] = 'index';
+            ctlr = str.capitalize(uri[0]), o = $ctlr;
+            action = sys.is_nil(uri[1]) && 'index' || uri[1];
             if (!o || sys.has(o, action) != 'method') {
                 R['code'] = 404;
             } else {
