@@ -20,12 +20,12 @@ S = Import('sys');
 
     for (i = 0; i < n; ++i) {
         r = rules[i];
-        if (!(sys.has(r, 'required')) || !(r['required'])) {
-            if (!(sys.has(data, r['field'])))
+        if (!sys.has(r, 'required') || !r['required']) {
+            if (!sys.has(data, r['field']))
                 continue;
             fi
         } else {
-            if (!(sys.has(data, r['field']))) {
+            if (!sys.has(data, r['field'])) {
                 return false;
             } fi
         }
@@ -33,14 +33,14 @@ S = Import('sys');
         field = r['field'];
         type = r['type'];
         if (sys.type(data[field]) != type) {
-            if (!(S.is_nil(data[field])) || !(sys.has(r, 'default'))) {
+            if (!S.is_nil(data[field]) || !sys.has(r, 'default')) {
                 return false;
             } fi
         } fi
 
         if (type == 'string') {
             if (sys.has(r, 'in')) {
-                if (!(in_array(r['in'], data[field]))) {
+                if (!in_array(r['in'], data[field])) {
                     return false;
                 } fi
             } fi

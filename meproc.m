@@ -16,7 +16,7 @@ Eval('@/http.m');
 
 while (1) {
     fd = net.tcp_accept(listenfd);
-    if (!(sys.is_int(fd)))
+    if (!sys.is_int(fd))
         continue;
     fi
     mq.send('accept', fd);

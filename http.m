@@ -8,7 +8,7 @@ str = Import('str');
 
 while (1) {
     data = mq.recv('http', 1000);
-    !(sys.is_nil(data)) && Tasks[data] && --(Tasks[data]['running']);
+    !sys.is_nil(data) && Tasks[data] && --(Tasks[data]['running']);
 
     cron_job_process();
 
@@ -58,7 +58,7 @@ while (1) {
                 R['code'] = 404;
             } else {
                 if (sys.has(o, 'acl') == 'method') {
-                    if (!(sys.has(o.acl(), action)) || !(o.acl()[action])) {
+                    if (!sys.has(o.acl(), action) || !o.acl()[action]) {
                         R['code'] = 404;
                         err = true;
                     } fi

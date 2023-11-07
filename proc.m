@@ -54,7 +54,7 @@ Proc {
     }
 
     @get_json_body() {
-        if (!(R['body']))
+        if (!R['body'])
             return nil;
         fi
         return J.decode(R['body']);
@@ -94,7 +94,7 @@ Proc {
         body['interval'];
         body['last_time'] = 0;
         body['run_flag'] = false;
-        if (!(Validate(this.rules()['body'], body))) {
+        if (!Validate(this.rules()['body'], body)) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Invalid JSON field']);
         } fi
@@ -103,16 +103,16 @@ Proc {
                 R['code'] = 400;
                 return J.encode(['code': 400, 'msg': "Type of cron job must be 'cron'"]);
             } fi
-            if (!(S.cron(body['cron'], S.time()))) {
+            if (!S.cron(body['cron'], S.time())) {
                 R['code'] = 400;
                 return J.encode(['code': 400, 'msg': 'Invalid cron format']);
             } fi
         } fi
-        if (S.has(Tasks, body['name']) && !(S.is_nil(Tasks[body['name']]))) {
+        if (S.has(Tasks, body['name']) && !S.is_nil(Tasks[body['name']])) {
             R['code'] = 403;
             return J.encode(['code': 403, 'msg': 'Program exists, please stop it at first']);
         } fi
-        if (!(S.has(body, 'cron')) && !(Start(body))) {
+        if (!S.has(body, 'cron') && !Start(body)) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Start failed']);
         } fi
@@ -122,12 +122,12 @@ Proc {
 
     @stop() {
         args = this.get_args();
-        if (!(Validate(this.rules()['args'], args))) {
+        if (!Validate(this.rules()['args'], args)) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'name is required']);
         } fi
         name = args['name'];
-        if (!(S.has(Tasks, name)) || S.is_nil(Tasks[name])) {
+        if (!S.has(Tasks, name) || S.is_nil(Tasks[name])) {
             R['code'] = 403;
             return J.encode(['code': 403, 'msg': 'Program not exists, please start it at first']);
         } fi
@@ -138,17 +138,17 @@ Proc {
 
     @restart() {
         args = this.get_args();
-        if (!(Validate(this.rules()['args'], args))) {
+        if (!Validate(this.rules()['args'], args)) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'name is required']);
         } fi
         name = args['name'];
-        if (!(S.has(Tasks, name)) || S.is_nil(Tasks[name])) {
+        if (!S.has(Tasks, name) || S.is_nil(Tasks[name])) {
             R['code'] = 403;
             return J.encode(['code': 403, 'msg': 'Program not exists, please start it at first']);
         } fi
         Stop(name);
-        if (!(Start(Tasks[name]))) {
+        if (!Start(Tasks[name])) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Start failed']);
         } fi
@@ -222,7 +222,7 @@ Proc {
     n = S.size(prog['deps']);
     for (i = 0; i < n; ++i) {
         name = prog['deps'][i];
-        if (in_set && (!(S.has(set, name)) || S.is_nil(set[name]))) {
+        if (in_set && (!S.has(set, name) || S.is_nil(set[name]))) {
             continue;
         } fi
         ret[name] = name;
@@ -233,17 +233,17 @@ Proc {
         n = S.size(ret);
         for (i = 0; i < n; ++i) {
             name = ret[i];
-            if (!(S.has(set, name)) || S.is_nil(set[name]))
+            if (!S.has(set, name) || S.is_nil(set[name]))
                 continue;
             fi
             deps = set[name]['deps'];
             m = S.size(deps);
             for (j = 0; j < m; ++j) {
-                if (in_set && (!(S.has(set, deps[j])) || S.is_nil(set[deps[j]]))) {
+                if (in_set && (!S.has(set, deps[j]) || S.is_nil(set[deps[j]]))) {
                     continue;
                 } fi
 
-                if (!(S.has(ret, deps[j]))) {
+                if (!S.has(ret, deps[j])) {
                     ret[deps[j]] = deps[j];
                     chg = true;
                 } fi
@@ -259,7 +259,7 @@ Proc {
     n = S.size(list);
     for (i = 0; i < n; ++i) {
         name = Str.slice(list[i]['alias'], ':')[0];
-        if (!(S.has(Tasks, name)) || !(Tasks[name])) {
+        if (!S.has(Tasks, name) || !Tasks[name]) {
             Log('error', "Task [" + name + "] is running but not in Tasks"); 
             continue;
         } fi
@@ -298,7 +298,7 @@ Proc {
     n = S.size(tasks['all']);
     for (i = 0; i < n; ++i) {
         t = tasks['all'][i];
-        !(Fetch_deps(t, tasks['all'], true)) && tasks['run'][t['name']] = t;
+        !Fetch_deps(t, tasks['all'], true) && tasks['run'][t['name']] = t;
     }
 
     return tasks['run'];
@@ -316,7 +316,7 @@ Proc {
     n = S.size(Tasks);
     for (i = 0; i < n; ++i) {
         prog = Tasks[i];
-        if (prog && S.has(prog, 'cron') && (!(prog['run_flag'])) && !(S.has(running_tasks, prog['name'])) && (now - prog['last_time']) >= 60) {
+        if (prog && S.has(prog, 'cron') && (!prog['run_flag']) && !S.has(running_tasks, prog['name']) && (now - prog['last_time']) >= 60) {
             next = S.cron(prog['cron'], now);
             if (next < now + Delta + 16)
                 prog['run_flag'] = true;
