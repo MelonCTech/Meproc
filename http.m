@@ -1,4 +1,5 @@
 #include "@/proc.m"
+#include "@/index.m"
 
 sys = Import('sys');
 net = Import('net');
@@ -50,7 +51,8 @@ while (1) {
 
             uri = str.slice(R['uri'], '/');
             !uri[0] && uri[0] = 'index';
-            ctlr = str.capitalize(uri[0]), o = $ctlr;
+            ctlr = str.capitalize(uri[0]);
+            o = $ctlr;
             action = sys.is_nil(uri[1]) && 'index' || uri[1];
             if (!o || sys.has(o, action) != 'method') {
                 R['code'] = 404;
