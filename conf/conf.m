@@ -2,7 +2,7 @@
 #define M_CONF
 
 Conf = [
-    'ip': '127.0.0.1',
+    'ip': '0.0.0.0',
     'port': '8606',
     'log_level': 'debug',
     'log_path': '/tmp/Meproc.log',
