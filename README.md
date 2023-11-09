@@ -125,15 +125,20 @@ Configuration file is `conf/conf.m`.
 
 ```
 Conf = [
-    'ip': '127.0.0.1',
+    'ip': '0.0.0.0',
     'port': '8606',
     'log_level': 'debug',
     'log_path': '/tmp/Meproc.log',
+    'web': [
+        'ip': '127.0.0.1',
+        'port': '8606',
+    ],
 ];
 ```
 
 `Conf` is a variable that contains all configurations that Meproc needs. And the name `Conf` can not be changed and it is also case-sensitive.
 
+The address in `web` is used to replace the address in Ajax requests on the web page, which is used to access Meproc to obtain process information. It should be set to the IP and port exposed by the host where Meproc is located."
 
 
 ## Example

@@ -6,6 +6,10 @@ Conf = [
     'port': '8606',
     'log_level': 'debug',
     'log_path': '/tmp/Meproc.log',
+    'web': [
+        'ip': '127.0.0.1',
+        'port': '8606',
+    ],
 ];
 
 /*

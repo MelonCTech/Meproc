@@ -1,5 +1,8 @@
+#include "@/conf/conf.m"
+
 F = Import('file');
 S = Import('sys');
+Str = Import('str');
 
 Index {
     @acl() {
@@ -11,7 +14,6 @@ Index {
     @index() {
         path = S.path('@/index.html');
         f = $F;
-	S.print(path);
         if (!f.open(path, 'r')) {
             R['code'] = 404;
             return 'Page Not Found';
@@ -20,6 +22,10 @@ Index {
         R['code'] = 200;
         body = f.read(f.size());
         f.close();
+        body = Str.replace([
+            '{{IP}}': Conf['web']['ip'],
+            '{{PORT}}': Conf['web']['port'],
+        ], body);
         return body;
     }
 }
