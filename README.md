@@ -12,6 +12,7 @@ Features:
 - Support one-time tasks
 - Support setting execution users and user groups for processes
 - Support multiple platforms: Windows, Linux, MacOS, etc.
+- Support for collecting output content from task processes.
 - The project only needs to pre-install the Melang interpreter, and no more others need to be installed.
 
 
@@ -206,3 +207,8 @@ We will see the output of Meproc like:
 [BSD-3-Clause License](https://github.com/Water-Melon/Melang/blob/master/LICENSE)
 
 Copyright (c) 2023-present, [MelonCTech](https://github.com/MelonCTech)
+
+
+## Documentation
+
+Please refer to our [Wiki](https://github.com/MelonCTech/Meproc/wiki) for more details.
