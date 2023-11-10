@@ -4,6 +4,7 @@
 J = Import('json');
 S = Import('sys');
 Str = Import('str');
+Mq = Import('mq');
 
 Tasks = [];
 Delta = 0;
@@ -324,5 +325,23 @@ Proc {
         } fi
     }
     Delta = S.time() - now;
+}
+
+@process_output_receive() {
+    n = S.size(Tasks);
+    for (i = 0; i < n; ++i) {
+        t = Tasks[i];
+        if (!t)
+            continue;
+        fi
+        m = t['replica'];
+        name = t['name'];
+        for (j = 0; j < m; ++j) {
+            data = Mq.recv(name + ':' + j, 1);
+            if (data) {
+                TaskLog(name + ':' + j, data);
+            } fi
+        }
+    }
 }
 

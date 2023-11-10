@@ -13,6 +13,8 @@ while (1) {
 
     cron_job_process();
 
+    process_output_receive();
+
     if (!timeout) {
         fd = mq.recv('accept', 1000);
         if (sys.is_nil(fd))

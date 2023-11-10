@@ -13,7 +13,7 @@ interval = conf['interval'];
 
 again:
 
-s.exec(cmd, -1, pid, conf['user'], conf['group']);
+s.exec(cmd, -1, pid, conf['user'], conf['group'], alias);
 
 msg = "Process " + pid + " (" + alias;
 if (conf['user'] || conf['group']) {

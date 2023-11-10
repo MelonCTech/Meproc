@@ -57,8 +57,19 @@ Log_level = 'debug';
     Sys.print(lc + s);
 }
 
+@TaskLog(alias, s)
+{
+    f = $F;
+    if (f.open(Conf['log_dir'] + '/' + alias + '.log', 'a+')) {
+        f.write(s);
+        f.close();
+    } else {
+        Sys.print("Open log file [" + Conf['log_dir'] + '/' + alias + '.log' + "] failed, " + f.errmsg());
+    }
+}
+
 Log_level_set(Conf['log_level']);
-Log_path_set(Conf['log_path']);
+Log_path_set(Conf['log_dir'] + '/Meproc.log');
 
 /*
  * Examples:
@@ -67,5 +78,6 @@ Log_path_set(Conf['log_path']);
  *  Log('info', "abc");
  *  Log('warn', "abc");
  *  Log('error', "abc");
+ *  TaskLog('aaa:1', 'test');
  */
 #endif
