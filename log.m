@@ -34,16 +34,16 @@ Log_level = 'debug';
     tm = Sys.utctime(Sys.time());
 
     if (level == 'debug') {
-        l = '[DEBUG] ' + tm;
+        l = tm + " [DEBUG]: ";
         lc = "\e[36m" + tm + " [DEBUG]\e[0m: ";
     } else if (level == 'info') {
-        l = '[INFO] ' + tm;
+        l = tm + " [INFO]: ";
         lc = "\e[32m" + tm + " [INFO]\e[0m: ";
     } else if (level == 'warn') {
-        l = '[WARN] ' + tm;
+        l = tm + " [WARN]: ";
         lc = "\e[33m" + tm + " [WARN]\e[0m: ";
     } else {
-        l = '[ERROR] ' + tm;
+        l = tm + " [ERROR]: ";
         lc = "\e[31m" + tm + " [ERROR]\e[0m: ";
     }
 
