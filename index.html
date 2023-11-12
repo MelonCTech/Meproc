@@ -1,7 +1,164 @@
 <html>
   <head>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <link = href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Meproc</title>
   </head>
   <body>
-    {{IP}}:{{PORT}}
+    <div id="header" class="sticky-top">
+      Meproc
+    </div>
+    <div id="content">
+    </div>
+    <div id="footer" class="fixed-bottom">
+      Copyright &#64; MelonCTech Organization
+    </div>
+
+
+  <style>
+    body {
+      background-color: floralwhite;
+    }
+    #header {
+      height: 64px;
+      background-color: black;
+      font-size: 40px;
+      vertical-align: middle;
+      color: #14ffc4;
+      padding: 0 20px;
+      text-shadow: 0 0 15px #14ffc4;
+      font-family: sans-serif;
+    }
+    #footer {
+      height: 30px;
+      background-color: black;
+      vertical-align: middle;
+      padding: 0 20px;
+      color: cadetblue;
+      font-family: 'Fira Code', monospace;
+    }
+    #content {
+      padding: 10px 30px;
+    }
+  </style>
+
+  <script>
+    $.ajax({
+      url: "http://{{IP}}:{{PORT}}/proc",
+      method: "GET",
+      success: function(response) {
+        var res = []
+        var tasks = response.data.tasks
+        var keys = Object.keys(tasks)
+        for (i = 0; i < keys.length; ++i) {
+          res.push({
+            name: tasks[keys[i]].name,
+            cmd: tasks[keys[i]].cmd,
+            type: tasks[keys[i]].type,
+            replica: tasks[keys[i]].replica,
+            start_time: tasks[keys[i]].start_time,
+            last_time: tasks[keys[i]].last_time,
+            running: tasks[keys[i]].running,
+            cron: tasks[keys[i]].cron,
+            user: tasks[keys[i]].user,
+            group: tasks[keys[i]].group,
+          })
+        }
+
+        $('#content').empty();
+
+        var div = $('<div>')
+        var table = $('<table>')
+        table.addClass('table table-striped')
+        div.append(table)
+        var header = $('<thead>')
+        table.append(header)
+        var tr = $('<tr>')
+        header.append(tr)
+        var th = $('<th>')
+        th.text('Name')
+        tr.append(th)
+        th = $('<th>')
+        th.text('Command')
+        tr.append(th)
+        th = $('<th>')
+        th.text('Type')
+        tr.append(th)
+        th = $('<th>')
+        th.text('Replica')
+        tr.append(th)
+        th = $('<th>')
+        th.text('Start Time')
+        tr.append(th)
+        th = $('<th>')
+        th.text('Last Time')
+        tr.append(th)
+        th = $('<th>')
+        th.text('Status')
+        tr.append(th)
+        th = $('<th>')
+        th.text('CRON')
+        tr.append(th)
+        th = $('<th>')
+        th.text('User')
+        tr.append(th)
+        th = $('<th>')
+        th.text('Group')
+        tr.append(th)
+        th = $('<th>')
+        th.text('Operation')
+        tr.append(th)
+
+        var tb = $('<tbody>')
+        table.append(tb)
+        var td
+        for (i = 0; i < res.length; ++i) {
+            tr = $('<tr>')
+            tb.append(tr)
+
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].name)
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].cmd)
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].type)
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].replica)
+            td = $('<td>')
+            tr.append(td)
+            var date = new Date(res[i].start_time * 1000);
+            td.text(date.toLocaleString())
+            td = $('<td>')
+            tr.append(td)
+            date = new Date(res[i].last_time * 1000);
+            td.text(date.toLocaleString())
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].running? 'running': 'not running')
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].cron)
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].user)
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].group)
+            td = $('<td>')
+            tr.append(td)
+        }
+
+        $('#content').append(div);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  </script>
   </body>
 </html>
