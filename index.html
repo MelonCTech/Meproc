@@ -7,7 +7,7 @@
   </head>
   <body>
     <div id="header" class="sticky-top">
-      Meproc
+      <a href="http://{{IP}}:{{PORT}/">Meproc</a>
     </div>
     <div id="content">
     </div>
@@ -29,6 +29,10 @@
       padding: 0 20px;
       text-shadow: 0 0 15px #14ffc4;
       font-family: sans-serif;
+    }
+    #header a {
+      color: inherit;
+      text-decoration: none;
     }
     #footer {
       height: 30px;
@@ -61,6 +65,7 @@
             last_time: tasks[keys[i]].last_time,
             running: tasks[keys[i]].running,
             cron: tasks[keys[i]].cron,
+            deps: tasks[keys[i]].deps,
             user: tasks[keys[i]].user,
             group: tasks[keys[i]].group,
           })
@@ -99,6 +104,9 @@
         tr.append(th)
         th = $('<th>')
         th.text('CRON')
+        tr.append(th)
+        th = $('<th>')
+        th.text('Dependencies')
         tr.append(th)
         th = $('<th>')
         th.text('User')
@@ -143,6 +151,9 @@
             td = $('<td>')
             tr.append(td)
             td.text(res[i].cron)
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].deps.join(', '))
             td = $('<td>')
             tr.append(td)
             td.text(res[i].user)
