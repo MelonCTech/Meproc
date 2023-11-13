@@ -10,7 +10,7 @@ if (!listenfd) {
     return;
 } fi
 
-Log('info', "Listen: " + Conf['ip'] + ':' + Conf['port']);
+Log('info', "Meproc v1.0.0. Listen on: " + Conf['ip'] + ':' + Conf['port']);
 
 Eval('@/http.m');
 

@@ -13,6 +13,7 @@ Features:
 - Support setting execution users and user groups for processes
 - Support multiple platforms: Windows, Linux, MacOS, etc.
 - Support for collecting output content from task processes.
+- Provide a Web Page for Task Management.
 - The project only needs to pre-install the Melang interpreter, and no more others need to be installed.
 
 
