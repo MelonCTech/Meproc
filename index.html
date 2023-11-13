@@ -2,8 +2,10 @@
   <head>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <link = href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <title>Meproc</title>
   </head>
   <body>
@@ -12,13 +14,46 @@
     </div>
     <div id="content">
     </div>
-    <button id="addButton" class="btn btn-success">New</button>
+    <button id="new" class="btn btn-success">New</button>
+    <div id="formModal" class="modal">
+      <div class="modal-content">
+        <span class="close" style="padding:5px">&times;</span>
+        <h2 style="padding:8px 20px">Start a new task</h2>
+        <form id="tform">
+          <p id="tips"></p>
+          <label for="tname">Task Name:</label>
+          <input type="text" id="tname" name="tname"><br><br>
+          <label for="tcmd">Command:</label>
+          <input type="text" id="tcmd" name="tcmd"><br><br>
+          <label for="ttype">Task Type:</label>
+          <select id="ttype" name="ttype">
+            <option value="once">once</option>
+            <option value="daemon">daemon</option>
+            <option value="cron">cron</option>
+          </select><br><br>
+          <label for="treplica">Replica:</label>
+          <input type="text" id="treplica" name="treplica"><br><br>
+          <label for="tuser">User:</label>
+          <input type="text" id="tuser" name="tuser"><br><br>
+          <label for="tgrp">Group:</label>
+          <input type="text" id="tgrp" name="tgrp"><br><br>
+          <label for="tdep">Dependencies:</label>
+          <select class="depselect" id="tdep" name="tdep" multiple="multiple" style="width: 60%;">
+          </select><br><br>
+          <input id="submitbtn" type="submit" value="Submit" class="btn btn-success" style="margin: 0">
+        </form>
+      </div>
+    </div>
     <div id="footer" class="fixed-bottom">
       Copyright &#64; MelonCTech Organization
     </div>
 
 
   <style>
+    .select2-container {
+      width: 100%;
+      margin-left: 10px;
+    }
     body {
       background-color: floralwhite;
     }
@@ -47,7 +82,7 @@
     #content {
       padding: 10px 30px;
     }
-    #addButton {
+    #new {
       position: fixed;
       bottom: 80px;
       right: 80px;
@@ -57,6 +92,45 @@
     }
     .popover {
       max-width: 200px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 40%;
+      bottom: 8%;
+    }
+    .modal-content form {
+      text-align: left;
+    }
+    .modal-content label {
+      display: inline-block;
+      width: 150px;
+      text-align: left;
+    }
+    .modal-content input[type="text"], 
+    .modal-content select {
+      width: 60%;
+      margin-left: 10px;
+    }
+    #tform {
+      padding: 30px;
+    }
+    #tips {
+      color: red;
+      display: none;
     }
   </style>
 
@@ -236,6 +310,57 @@
         console.log(error);
       }
     });
+
+    $('#new').on('click', function() {
+      $('#tips').css('display', 'none')
+      $("#formModal").css("display", "block");
+    })
+    $(".close").click(function(){
+      $("#formModal").css("display", "none");
+    });
+    $(window).click(function(event) {
+      if (event.target == $("#formModal")[0]) {
+        $("#formModal").css("display", "none");
+      }
+    });
+
+    $('.depselect').select2({
+      tags: true,
+      tokenSeparators: [',', ' ']
+    });
+
+    $('#submitbtn').on('click', function(ev) {
+      ev.preventDefault();
+      $('#tips').css('display', 'none')
+      var data = {
+        name: $('#tname').val(),
+        cmd: $('#tcmd').val(),
+        type: $('#ttype').val(),
+        replica: parseInt($('#treplica').val()),
+      }
+      if ($('#tuser').val()) data.user = $('#tuser').val()
+      if ($('#tgrp').val()) data.group = $('#tgrp').val()
+      if ($('#tdep').val()) data.deps = $('tdep').val()
+      $.ajax({
+        url: "http://{{IP}}:{{PORT}}/proc",
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        success: function(response) {
+          $('#tips').text("Start " + data.name + " successfully. Refreshing in 2 seconds...")
+          $('#tips').css('display', 'block')
+          $('#tips').css('color', 'darkcyan')
+          setTimeout(function() {
+            window.location.href = 'http://{{IP}}:{{PORT}}/';
+          }, 2000);
+        },
+        error: function(xhr, status, error) {
+          $('#tips').text(error)
+          $('#tips').css('display', 'block')
+          $('#tips').css('color', 'red')
+        }
+      });
+    })
   </script>
   </body>
 </html>
