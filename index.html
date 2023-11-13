@@ -11,6 +11,7 @@
     </div>
     <div id="content">
     </div>
+    <button id="addButton" class="btn btn-success">New</button>
     <div id="footer" class="fixed-bottom">
       Copyright &#64; MelonCTech Organization
     </div>
@@ -44,6 +45,14 @@
     }
     #content {
       padding: 10px 30px;
+    }
+    #addButton {
+      position: fixed;
+      bottom: 80px;
+      right: 80px;
+    }
+    .btn {
+      margin: 0 3px;
     }
   </style>
 
@@ -122,46 +131,62 @@
         table.append(tb)
         var td
         for (i = 0; i < res.length; ++i) {
-            tr = $('<tr>')
-            tb.append(tr)
+          tr = $('<tr>')
+          tb.append(tr)
 
-            td = $('<td>')
-            tr.append(td)
-            td.text(res[i].name)
-            td = $('<td>')
-            tr.append(td)
-            td.text(res[i].cmd)
-            td = $('<td>')
-            tr.append(td)
-            td.text(res[i].type)
-            td = $('<td>')
-            tr.append(td)
-            td.text(res[i].replica)
-            td = $('<td>')
-            tr.append(td)
-            var date = new Date(res[i].start_time * 1000);
-            td.text(date.toLocaleString())
-            td = $('<td>')
-            tr.append(td)
-            date = new Date(res[i].last_time * 1000);
-            td.text(date.toLocaleString())
-            td = $('<td>')
-            tr.append(td)
-            td.text(res[i].running? 'running': 'not running')
-            td = $('<td>')
-            tr.append(td)
-            td.text(res[i].cron)
-            td = $('<td>')
-            tr.append(td)
-            td.text(res[i].deps.join(', '))
-            td = $('<td>')
-            tr.append(td)
-            td.text(res[i].user)
-            td = $('<td>')
-            tr.append(td)
-            td.text(res[i].group)
-            td = $('<td>')
-            tr.append(td)
+          td = $('<td>')
+          tr.append(td)
+          td.text(res[i].name)
+          td = $('<td>')
+          tr.append(td)
+          td.text(res[i].cmd)
+          td = $('<td>')
+          tr.append(td)
+          td.text(res[i].type)
+          td = $('<td>')
+          tr.append(td)
+          td.text(res[i].replica)
+          td = $('<td>')
+          tr.append(td)
+          if (parseInt(res[i].start_time) > 0) {
+           var date = new Date(res[i].start_time * 1000);
+           td.text(date.toLocaleString())
+          }
+          td = $('<td>')
+          tr.append(td)
+          if (parseInt(res[i].last_time) > 0) {
+           var date = new Date(res[i].last_time * 1000);
+           td.text(date.toLocaleString())
+          }
+          td = $('<td>')
+          tr.append(td)
+          td.text(res[i].running? 'running': 'not running')
+          td = $('<td>')
+          tr.append(td)
+          td.text(res[i].cron)
+          td = $('<td>')
+          tr.append(td)
+          td.text(res[i].deps.join(', '))
+          td = $('<td>')
+          tr.append(td)
+          td.text(res[i].user)
+          td = $('<td>')
+          tr.append(td)
+          td.text(res[i].group)
+          td = $('<td>')
+          tr.append(td)
+
+          var btn = $('<button>')
+          td.append(btn)
+          btn.attr('id', 'rm-' + res[i].name)
+          btn.attr('class', 'btn btn-danger')
+          btn.text('Remove')
+
+          btn = $('<button>')
+          td.append(btn)
+          btn.attr('id', 'restart-' + res[i].name)
+          btn.attr('class', 'btn btn-warning')
+          btn.text('Rerun')
         }
 
         $('#content').append(div);
