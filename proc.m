@@ -104,6 +104,7 @@ Proc {
         body['interval'];
         body['replica'];
         body['last_time'] = 0;
+        body['type'] == 'cron' && body['cron'];
         body['run_flag'] = false;
         if (!Validate(this.rules()['body'], body)) {
             R['code'] = 400;
