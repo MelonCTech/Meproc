@@ -79,9 +79,18 @@ Proc {
     }
 
     @list() {
+        data = [];
+        keys = S.keys(Tasks);
+        n = S.size(keys);
+        for (i = 0; i < n; ++i) {
+            if (!Tasks[keys[i]])
+                continue;
+            fi
+            data[keys[i]] = Tasks[keys[i]];
+        }
         return J.encode(['code': 200, 'msg': 'OK', 'data': [
             'running': S.exec(),
-            'tasks': Tasks,
+            'tasks': data,
         ]]);
     }
 

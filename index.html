@@ -187,10 +187,29 @@
           btn.attr('id', 'rm-' + name)
           btn.attr('class', 'btn btn-danger')
           btn.text('Remove')
+          btn.popover({
+            content: "Operation successful",
+            trigger: 'manual',
+            placement: "top",
+          })
+          btn.on('click', function() {
+            $.ajax({
+              url: 'http://{{IP}}:{{PORT}}/proc?name=' + name,
+              type: 'DELETE',
+              success: function(result) {
+                var b = $('#rm-'+name)
+                b.popover('show');
+                setTimeout(function() {
+                  b.popover('hide');
+                  window.location.href = 'http://{{IP}}:{{PORT}}/';
+                }, 2000);
+              }
+            });
+          });
 
           btn = $('<button>')
           td.append(btn)
-          btn.attr('id', 'restart-' + name)
+          btn.attr('id', 'rerun-' + name)
           btn.attr('class', 'btn btn-warning')
           btn.attr('data-toggle', "popover")
           btn.text('Rerun')
@@ -201,12 +220,12 @@
           })
           btn.on('click', function() {
             $.post('http://{{IP}}:{{PORT}}/proc?name=' + name, function(response) {
-              console.log(response)
-              btn.popover('show');
+              var b = $('#rerun-'+name)
+              b.popover('show');
               setTimeout(function() {
-                btn.popover('hide');
+                b.popover('hide');
                 window.location.href = 'http://{{IP}}:{{PORT}}/';
-              }, 3000);
+              }, 2000);
             })
           })
         }
