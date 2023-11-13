@@ -26,19 +26,27 @@
           <label for="tcmd">Command:</label>
           <input type="text" id="tcmd" name="tcmd"><br><br>
           <label for="ttype">Task Type:</label>
-          <select id="ttype" name="ttype">
+          <select class="depselect" id="ttype" name="ttype" style="width: 60%;">
             <option value="once">once</option>
             <option value="daemon">daemon</option>
             <option value="cron">cron</option>
           </select><br><br>
+          <div id="interval-box">
+            <label for="tinterval">Interval:</label>
+            <input type="text" id="tinterval" name="tinterval" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="Optional, default is 3 seconds"/><br><br>
+          </div>
+          <div id="cron-box">
+            <label for="tcron">Cron:</label>
+            <input type="text" id="tcron" name="tcron" onkeyup="validateCronExpression(this)" placeholder="Optional, default is * * * * *" /><br><br>
+          </div>
           <label for="treplica">Replica:</label>
-          <input type="text" id="treplica" name="treplica"><br><br>
+          <input type="text" id="treplica" name="treplica" placeholder="Optional, default is 1"><br><br>
           <label for="tuser">User:</label>
-          <input type="text" id="tuser" name="tuser"><br><br>
+          <input type="text" id="tuser" name="tuser" placeholder="Optional"><br><br>
           <label for="tgrp">Group:</label>
-          <input type="text" id="tgrp" name="tgrp"><br><br>
+          <input type="text" id="tgrp" name="tgrp" placeholder="Optional"><br><br>
           <label for="tdep">Dependencies:</label>
-          <select class="depselect" id="tdep" name="tdep" multiple="multiple" style="width: 60%;">
+          <select class="depselect" id="tdep" name="tdep" multiple="multiple" style="width: 60%;" placeholder="Optional">
           </select><br><br>
           <input id="submitbtn" type="submit" value="Submit" class="btn btn-success" style="margin: 0">
         </form>
@@ -135,232 +143,265 @@
   </style>
 
   <script>
-    $.ajax({
-      url: "http://{{IP}}:{{PORT}}/proc",
-      method: "GET",
-      success: function(response) {
-        var res = []
-        var tasks = response.data.tasks
-        var keys = Object.keys(tasks)
-        for (i = 0; i < keys.length; ++i) {
-          res.push({
-            name: tasks[keys[i]].name,
-            cmd: tasks[keys[i]].cmd,
-            type: tasks[keys[i]].type,
-            replica: tasks[keys[i]].replica,
-            start_time: tasks[keys[i]].start_time,
-            last_time: tasks[keys[i]].last_time,
-            running: tasks[keys[i]].running,
-            cron: tasks[keys[i]].cron,
-            deps: tasks[keys[i]].deps,
-            user: tasks[keys[i]].user,
-            group: tasks[keys[i]].group,
-          })
-        }
-
-        $('#content').empty();
-
-        var div = $('<div>')
-        var table = $('<table>')
-        table.addClass('table table-striped')
-        div.append(table)
-        var header = $('<thead>')
-        table.append(header)
-        var tr = $('<tr>')
-        header.append(tr)
-        var th = $('<th>')
-        th.text('Name')
-        tr.append(th)
-        th = $('<th>')
-        th.text('Command')
-        tr.append(th)
-        th = $('<th>')
-        th.text('Type')
-        tr.append(th)
-        th = $('<th>')
-        th.text('Replica')
-        tr.append(th)
-        th = $('<th>')
-        th.text('Start Time')
-        tr.append(th)
-        th = $('<th>')
-        th.text('Last Time')
-        tr.append(th)
-        th = $('<th>')
-        th.text('Status')
-        tr.append(th)
-        th = $('<th>')
-        th.text('CRON')
-        tr.append(th)
-        th = $('<th>')
-        th.text('Dependencies')
-        tr.append(th)
-        th = $('<th>')
-        th.text('User')
-        tr.append(th)
-        th = $('<th>')
-        th.text('Group')
-        tr.append(th)
-        th = $('<th>')
-        th.text('Operation')
-        tr.append(th)
-
-        var tb = $('<tbody>')
-        table.append(tb)
-        var td
-        for (i = 0; i < res.length; ++i) {
-          var name = res[i].name
-
-          tr = $('<tr>')
-          tb.append(tr)
-
-          td = $('<td>')
-          tr.append(td)
-          td.text(name)
-          td = $('<td>')
-          tr.append(td)
-          td.text(res[i].cmd)
-          td = $('<td>')
-          tr.append(td)
-          td.text(res[i].type)
-          td = $('<td>')
-          tr.append(td)
-          td.text(res[i].replica)
-          td = $('<td>')
-          tr.append(td)
-          if (parseInt(res[i].start_time) > 0) {
-           var date = new Date(res[i].start_time * 1000);
-           td.text(date.toLocaleString())
+    window.onload = function() {
+      $.ajax({
+        url: "http://{{IP}}:{{PORT}}/proc",
+        method: "GET",
+        success: function(response) {
+          var res = []
+          var tasks = response.data.tasks
+          var keys = Object.keys(tasks)
+          for (i = 0; i < keys.length; ++i) {
+            res.push({
+              name: tasks[keys[i]].name,
+              cmd: tasks[keys[i]].cmd,
+              type: tasks[keys[i]].type,
+              replica: tasks[keys[i]].replica,
+              start_time: tasks[keys[i]].start_time,
+              last_time: tasks[keys[i]].last_time,
+              running: tasks[keys[i]].running,
+              cron: tasks[keys[i]].cron,
+              deps: tasks[keys[i]].deps,
+              user: tasks[keys[i]].user,
+              group: tasks[keys[i]].group,
+            })
           }
-          td = $('<td>')
-          tr.append(td)
-          if (parseInt(res[i].last_time) > 0) {
-           var date = new Date(res[i].last_time * 1000);
-           td.text(date.toLocaleString())
-          }
-          td = $('<td>')
-          tr.append(td)
-          td.text(res[i].running? 'running': 'not running')
-          td = $('<td>')
-          tr.append(td)
-          td.text(res[i].cron)
-          td = $('<td>')
-          tr.append(td)
-          td.text(res[i].deps.join(', '))
-          td = $('<td>')
-          tr.append(td)
-          td.text(res[i].user)
-          td = $('<td>')
-          tr.append(td)
-          td.text(res[i].group)
-          td = $('<td>')
-          tr.append(td)
 
-          var btn = $('<button>')
-          td.append(btn)
-          btn.attr('id', 'rm-' + name)
-          btn.attr('class', 'btn btn-danger')
-          btn.text('Remove')
-          btn.popover({
-            content: "Operation successful",
-            trigger: 'manual',
-            placement: "top",
-          })
-          btn.on('click', function() {
-            $.ajax({
-              url: 'http://{{IP}}:{{PORT}}/proc?name=' + name,
-              type: 'DELETE',
-              success: function(result) {
-                var b = $('#rm-'+name)
+          $('#content').empty();
+
+          var div = $('<div>')
+          var table = $('<table>')
+          table.addClass('table table-striped')
+          div.append(table)
+          var header = $('<thead>')
+          table.append(header)
+          var tr = $('<tr>')
+          header.append(tr)
+          var th = $('<th>')
+          th.text('Name')
+          tr.append(th)
+          th = $('<th>')
+          th.text('Command')
+          tr.append(th)
+          th = $('<th>')
+          th.text('Type')
+          tr.append(th)
+          th = $('<th>')
+          th.text('Replica')
+          tr.append(th)
+          th = $('<th>')
+          th.text('Start Time')
+          tr.append(th)
+          th = $('<th>')
+          th.text('Last Time')
+          tr.append(th)
+          th = $('<th>')
+          th.text('Status')
+          tr.append(th)
+          th = $('<th>')
+          th.text('CRON')
+          tr.append(th)
+          th = $('<th>')
+          th.text('Dependencies')
+          tr.append(th)
+          th = $('<th>')
+          th.text('User')
+          tr.append(th)
+          th = $('<th>')
+          th.text('Group')
+          tr.append(th)
+          th = $('<th>')
+          th.text('Operation')
+          tr.append(th)
+
+          var tb = $('<tbody>')
+          table.append(tb)
+          var td
+          for (i = 0; i < res.length; ++i) {
+            var name = res[i].name
+
+            tr = $('<tr>')
+            tb.append(tr)
+
+            td = $('<td>')
+            tr.append(td)
+            td.text(name)
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].cmd)
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].type)
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].replica)
+            td = $('<td>')
+            tr.append(td)
+            if (parseInt(res[i].start_time) > 0) {
+             var date = new Date(res[i].start_time * 1000);
+             td.text(date.toLocaleString())
+            }
+            td = $('<td>')
+            tr.append(td)
+            if (parseInt(res[i].last_time) > 0) {
+             var date = new Date(res[i].last_time * 1000);
+             td.text(date.toLocaleString())
+            }
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].running? 'running': 'not running')
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].cron)
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].deps.join(', '))
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].user)
+            td = $('<td>')
+            tr.append(td)
+            td.text(res[i].group)
+            td = $('<td>')
+            tr.append(td)
+
+            var btn = $('<button>')
+            td.append(btn)
+            btn.attr('id', 'rm-' + name)
+            btn.attr('class', 'btn btn-danger')
+            btn.text('Remove')
+            btn.popover({
+              content: "Operation successful",
+              trigger: 'manual',
+              placement: "top",
+            })
+            btn.on('click', function() {
+              $.ajax({
+                url: 'http://{{IP}}:{{PORT}}/proc?name=' + name,
+                type: 'DELETE',
+                success: function(result) {
+                  var b = $('#rm-'+name)
+                  b.popover('show');
+                  setTimeout(function() {
+                    b.popover('hide');
+                    window.location.href = 'http://{{IP}}:{{PORT}}/';
+                  }, 2000);
+                }
+              });
+            });
+
+            btn = $('<button>')
+            td.append(btn)
+            btn.attr('id', 'rerun-' + name)
+            btn.attr('class', 'btn btn-warning')
+            btn.attr('data-toggle', "popover")
+            btn.text('Rerun')
+            btn.popover({
+              content: "Operation successful",
+              trigger: 'manual',
+              placement: "top",
+            })
+            btn.on('click', function() {
+              $.post('http://{{IP}}:{{PORT}}/proc?name=' + name, function(response) {
+                var b = $('#rerun-'+name)
                 b.popover('show');
                 setTimeout(function() {
                   b.popover('hide');
                   window.location.href = 'http://{{IP}}:{{PORT}}/';
                 }, 2000);
-              }
-            });
-          });
-
-          btn = $('<button>')
-          td.append(btn)
-          btn.attr('id', 'rerun-' + name)
-          btn.attr('class', 'btn btn-warning')
-          btn.attr('data-toggle', "popover")
-          btn.text('Rerun')
-          btn.popover({
-            content: "Operation successful",
-            trigger: 'manual',
-            placement: "top",
-          })
-          btn.on('click', function() {
-            $.post('http://{{IP}}:{{PORT}}/proc?name=' + name, function(response) {
-              var b = $('#rerun-'+name)
-              b.popover('show');
-              setTimeout(function() {
-                b.popover('hide');
-                window.location.href = 'http://{{IP}}:{{PORT}}/';
-              }, 2000);
+              })
             })
-          })
-        }
+          }
 
-        $('#content').append(div);
-      },
-      error: function(error) {
-        console.log(error);
-      }
-    });
-
-    $('#new').on('click', function() {
-      $('#tips').css('display', 'none')
-      $("#formModal").css("display", "block");
-    })
-    $(".close").click(function(){
-      $("#formModal").css("display", "none");
-    });
-    $(window).click(function(event) {
-      if (event.target == $("#formModal")[0]) {
-        $("#formModal").css("display", "none");
-      }
-    });
-
-    $('.depselect').select2({
-      tags: true,
-      tokenSeparators: [',', ' ']
-    });
-
-    $('#submitbtn').on('click', function(ev) {
-      ev.preventDefault();
-      $('#tips').css('display', 'none')
-      var data = {
-        name: $('#tname').val(),
-        cmd: $('#tcmd').val(),
-        type: $('#ttype').val(),
-        replica: parseInt($('#treplica').val()),
-      }
-      if ($('#tuser').val()) data.user = $('#tuser').val()
-      if ($('#tgrp').val()) data.group = $('#tgrp').val()
-      if ($('#tdep').val()) data.deps = $('tdep').val()
-      $.ajax({
-        url: "http://{{IP}}:{{PORT}}/proc",
-        type: "PUT",
-        contentType: "application/json",
-        data: JSON.stringify(data),
-        success: function(response) {
-          $('#tips').text("Start " + data.name + " successfully. Refreshing in 2 seconds...")
-          $('#tips').css('display', 'block')
-          $('#tips').css('color', 'darkcyan')
-          setTimeout(function() {
-            window.location.href = 'http://{{IP}}:{{PORT}}/';
-          }, 2000);
+          $('#content').append(div);
         },
-        error: function(xhr, status, error) {
-          $('#tips').text(error)
-          $('#tips').css('display', 'block')
-          $('#tips').css('color', 'red')
+        error: function(error) {
+          console.log(error);
         }
       });
-    })
+
+      $('#new').on('click', function() {
+        $('#tips').css('display', 'none')
+        $("#formModal").css("display", "block");
+      })
+      $(".close").click(function(){
+        $("#formModal").css("display", "none");
+      });
+      $(window).click(function(event) {
+        if (event.target == $("#formModal")[0]) {
+          $("#formModal").css("display", "none");
+        }
+      });
+
+      $('.depselect').select2({
+        tags: true,
+        tokenSeparators: [',', ' ']
+      });
+
+      $('#submitbtn').on('click', function(ev) {
+        ev.preventDefault();
+        $('#tips').css('display', 'none')
+        var type = $('#ttype').val()
+        var data = {
+          name: $('#tname').val(),
+          cmd: $('#tcmd').val(),
+          type: type,
+          replica: parseInt($('#treplica').val()),
+        }
+        if ($('#tuser').val()) data.user = $('#tuser').val()
+        if ($('#tgrp').val()) data.group = $('#tgrp').val()
+        if ($('#tdep').val()) data.deps = $('#tdep').val()
+        if (type == 'daemon' && $('#tinterval').val()) data.interval = $('#tinterval').val()
+        if (type == 'cron' && $('#tcron').val()) data.cron = $('#tcron').val()
+        $.ajax({
+          url: "http://{{IP}}:{{PORT}}/proc",
+          type: "PUT",
+          contentType: "application/json",
+          data: JSON.stringify(data),
+          success: function(response) {
+            $('#tips').text("Start " + data.name + " successfully. Refreshing in 2 seconds...")
+            $('#tips').css('display', 'block')
+            $('#tips').css('color', 'darkcyan')
+            setTimeout(function() {
+              window.location.href = 'http://{{IP}}:{{PORT}}/';
+            }, 2000);
+          },
+          error: function(xhr, status, error) {
+            $('#tips').text(error)
+            $('#tips').css('display', 'block')
+            $('#tips').css('color', 'red')
+          }
+        });
+      })
+
+      $('#interval-box').css('display', 'none')
+      $('#cron-box').css('display', 'none')
+      $('#ttype').change(function() {
+        var val = $(this).val()
+        if (val == 'daemon') {
+          $('#cron-box').css('display', 'none')
+          $('#interval-box').css('display', 'block')
+        } else if (val == 'cron') {
+          $('#interval-box').css('display', 'none')
+          $('#cron-box').css('display', 'block')
+        } else {
+          $('#interval-box').css('display', 'none')
+          $('#cron-box').css('display', 'none')
+        }
+      })
+
+      function validateCronExpression(input) {
+        const cronRegex = /^((\*|[0-5]?\d)(-\d+)?(\/[1-9]\d*)?|[0-5]?\d[0-5]?\d|\?|\*|\*)\s((\*|[01]?\d|2[0-3])(-\d+)?(\/[1-9]\d*)?|[01]?\d|2[0-3])\s((\*|[1-2]?\d|3[01])(-\d+)?(\/[1-9]\d*)?|[1-2]?\d|3[01])\s((\*|0?[1-9]|1[0-2])(-\d+)?(\/[1-9]\d*)?|0?[1-9]|1[0-2])\s((\*|[0-6])(-\d+)?(\/[1-9]\d*)?|[0-6])$/
+
+        const inputValue = input.value.trim();
+
+        if (cronRegex.test(inputValue)) {
+          input.style.border = '2px solid green';
+        } else {
+          input.style.border = '2px solid red';
+        }
+      }
+    }
   </script>
   </body>
 </html>

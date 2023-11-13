@@ -16,10 +16,10 @@ Proc {
                 ['field': 'name', 'type': 'string', 'required': true],
                 ['field': 'cmd', 'type': 'string', 'required': true],
                 ['field': 'type', 'type': 'string', 'required': true, 'in': ['once', 'daemon', 'cron']],
-	        ['field': 'cron', 'type': 'string', 'required': false,],
+	        ['field': 'cron', 'type': 'string', 'required': false, 'default': '* * * * *'],
 	        ['field': 'user', 'type': 'string', 'required': false,],
 	        ['field': 'group', 'type': 'string', 'required': false,],
-                ['field': 'replica', 'type': 'int', 'required': true, 'default': 0],
+                ['field': 'replica', 'type': 'int', 'required': false, 'default': 1],
                 ['field': 'interval', 'type': 'int', 'required': false, 'default': 3],
                 ['field': 'deps', 'type': 'array', 'required': false, 'element_type': 'string', 'default': []],
             ],
@@ -102,11 +102,16 @@ Proc {
         } fi
         body['deps'];
         body['interval'];
+        body['replica'];
         body['last_time'] = 0;
         body['run_flag'] = false;
         if (!Validate(this.rules()['body'], body)) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Invalid JSON field']);
+        } fi
+        if (S.int(body['replica']) <= 0) {
+            R['code'] = 400;
+            return J.encode(['code': 400, 'msg': "Replica must be a positive integer'"]);
         } fi
         if (S.has(body, 'cron')) {
             if (body['type'] != 'cron') {
