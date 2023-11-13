@@ -7,7 +7,7 @@ Conf = [
     'log_level': 'debug',
     'log_dir': '/tmp',
     'web': [
-        'ip': '127.0.0.1',
+        'ip': '172.16.78.129',
         'port': '8606',
     ],
 ];

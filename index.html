@@ -3,6 +3,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <link = href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <title>Meproc</title>
   </head>
   <body>
@@ -53,6 +54,9 @@
     }
     .btn {
       margin: 0 3px;
+    }
+    .popover {
+      max-width: 200px;
     }
   </style>
 
@@ -131,12 +135,14 @@
         table.append(tb)
         var td
         for (i = 0; i < res.length; ++i) {
+          var name = res[i].name
+
           tr = $('<tr>')
           tb.append(tr)
 
           td = $('<td>')
           tr.append(td)
-          td.text(res[i].name)
+          td.text(name)
           td = $('<td>')
           tr.append(td)
           td.text(res[i].cmd)
@@ -178,15 +184,31 @@
 
           var btn = $('<button>')
           td.append(btn)
-          btn.attr('id', 'rm-' + res[i].name)
+          btn.attr('id', 'rm-' + name)
           btn.attr('class', 'btn btn-danger')
           btn.text('Remove')
 
           btn = $('<button>')
           td.append(btn)
-          btn.attr('id', 'restart-' + res[i].name)
+          btn.attr('id', 'restart-' + name)
           btn.attr('class', 'btn btn-warning')
+          btn.attr('data-toggle', "popover")
           btn.text('Rerun')
+          btn.popover({
+            content: "Operation successful",
+            trigger: 'manual',
+            placement: "top",
+          })
+          btn.on('click', function() {
+            $.post('http://{{IP}}:{{PORT}}/proc?name=' + name, function(response) {
+              console.log(response)
+              btn.popover('show');
+              setTimeout(function() {
+                btn.popover('hide');
+                window.location.href = 'http://{{IP}}:{{PORT}}/';
+              }, 3000);
+            })
+          })
         }
 
         $('#content').append(div);
