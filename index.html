@@ -302,14 +302,18 @@
               placement: "top",
             })
             btn.on('click', function() {
-              $.post('http://{{IP}}:{{PORT}}/proc?name=' + name, function(response) {
-                var b = $('#rerun-'+name)
-                b.popover('show');
-                setTimeout(function() {
-                  b.popover('hide');
-                  window.location.href = 'http://{{IP}}:{{PORT}}/';
-                }, 2000);
-              })
+              $.ajax({
+                url: "http://{{IP}}:{{PORT}}/proc?name=" + name,
+                type: "PUT",
+                success: function(response) {
+                  var b = $('#rerun-'+name)
+                  b.popover('show');
+                  setTimeout(function() {
+                    b.popover('hide');
+                    window.location.href = 'http://{{IP}}:{{PORT}}/';
+                  }, 2000);
+                }
+              });
             })
           }
 
@@ -355,7 +359,7 @@
         if (type == 'cron' && $('#tcron').val()) data.cron = $('#tcron').val()
         $.ajax({
           url: "http://{{IP}}:{{PORT}}/proc",
-          type: "PUT",
+          type: "POST",
           contentType: "application/json",
           data: JSON.stringify(data),
           success: function(response) {
