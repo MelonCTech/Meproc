@@ -275,6 +275,9 @@ Proc {
     n = S.size(list);
     for (i = 0; i < n; ++i) {
         name = Str.slice(list[i]['alias'], ':')[0];
+        if (name == 'bootstrap')
+            continue;
+        fi
         if (!S.has(Tasks, name) || !Tasks[name]) {
             Log('error', "Task [" + name + "] is running but not in Tasks"); 
             continue;
@@ -358,5 +361,9 @@ Proc {
             } fi
         }
     }
+    data = Mq.recv('bootstrap', 1);
+    if (data) {
+        TaskLog('bootstrap', data);
+    } fi
 }
 
