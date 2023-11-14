@@ -51,10 +51,10 @@ The default IP is `127.0.0.1` and port is `8606`.
 Here is a simple example.
 
 ```bash
-curl -v -XPUT http://127.1:8606/proc -d '{"name": "sleep1", "cmd": "sleep 5", "type": "once", "replica": 2, "user": "guest"}'
+curl -v -XPOST http://127.1:8606/proc -d '{"name": "sleep1", "cmd": "sleep 5", "type": "once", "replica": 2, "user": "guest"}'
 ```
 
-Using a PUT HTTP request to start up a new process.
+Using a POST HTTP request to start up a new process.
 
 `name` is the task name. One task is a group of same processes. In this example, we will start up two process to run `sleep 5`.
 
@@ -70,7 +70,7 @@ Using a PUT HTTP request to start up a new process.
 Let's take a look at another example.
 
 ```bash
-curl -v -XPUT http://127.1:8606/proc -d '{"name": "sleep2", "cmd": "sleep 5", "type": "once", "replica": 2, "deps": ["sleep1"]}'
+curl -v -XPOST http://127.1:8606/proc -d '{"name": "sleep2", "cmd": "sleep 5", "type": "once", "replica": 2, "deps": ["sleep1"]}'
 ```
 
 `deps` indicates the list of task names that this task depends on.
@@ -82,7 +82,7 @@ The meaning of "dependency" is that when a task is going to be executed, if it f
 A cron job example.
 
 ```bash
-curl -v -XPUT http://127.1:8606/proc -d '{"name": "sleep2", "cmd": "sleep 5", "type": "cron", "cron": "* * * * *", "replica": 2}'
+curl -v -XPOST http://127.1:8606/proc -d '{"name": "sleep2", "cmd": "sleep 5", "type": "cron", "cron": "* * * * *", "replica": 2}'
 ```
 
 This task will be executed every minute.
@@ -104,7 +104,7 @@ curl -v -XDELETE http://127.1:8606/proc?name=sleep1
 Let's restart task `sleep2`.
 
 ```bash
-curl -v -XPOST http://127.1:8606/proc?name=sleep2
+curl -v -XPUT http://127.1:8606/proc?name=sleep2
 ```
 
  Restart will stop this task and start it again. And restart is only working on the tasks those are not stopped by `curl -v -XDELETE http://127.1:8606/proc?name=<proc_name>`.
@@ -150,21 +150,21 @@ You can find Meproc's log files and corresponding task process output log files 
 We start up Meproc, and run the commands that given below:
 
 ```bash
-curl -v -XPUT http://127.1:8606/proc -d '{"name": "sleep1", "cmd": "sleep 5", "type": "once", "replica": 2}'
+curl -v -XPOST http://127.1:8606/proc -d '{"name": "sleep1", "cmd": "sleep 5", "type": "once", "replica": 2}'
 
-curl -v -XPUT http://127.1:8606/proc -d '{"name": "sleep2", "cmd": "sleep 5", "type": "once", "replica": 2, "deps": ["sleep1"]}'
+curl -v -XPOST http://127.1:8606/proc -d '{"name": "sleep2", "cmd": "sleep 5", "type": "once", "replica": 2, "deps": ["sleep1"]}'
 
-curl -v -XPUT http://127.1:8606/proc -d '{"name": "sleep3", "cmd": "sleep 5", "type": "once", "replica": 2, "deps": ["sleep1", "sleep2"]}'
+curl -v -XPOST http://127.1:8606/proc -d '{"name": "sleep3", "cmd": "sleep 5", "type": "once", "replica": 2, "deps": ["sleep1", "sleep2"]}'
 
 curl -v http://127.1:8606/proc
 
 curl -v -XDELETE http://127.1:8606/proc?name=sleep1
 
-curl -v -XPUT http://127.1:8606/proc -d '{"name": "sleep1", "cmd": "sleep 5", "type": "once", "replica": 2}'
+curl -v -XPOST http://127.1:8606/proc -d '{"name": "sleep1", "cmd": "sleep 5", "type": "once", "replica": 2}'
 
-curl -v -XPOST http://127.1:8606/proc?name=sleep1
+curl -v -XPUT http://127.1:8606/proc?name=sleep1
 
-curl -v -XPUT http://127.1:8606/proc -d '{"name": "sleep4", "cmd": "sleep 5", "type": "cron", "cron": "* * * * *", "replica": 2}'
+curl -v -XPOST http://127.1:8606/proc -d '{"name": "sleep4", "cmd": "sleep 5", "type": "cron", "cron": "* * * * *", "replica": 2}'
 ```
 
 We will see the output of Meproc like:

@@ -68,9 +68,9 @@ Proc {
         if (method == 'GET') {
             return this.list();
         } else if (method == 'POST') {
-            return this.restart();
-        } else if (method == 'PUT') {
             return this.start();
+        } else if (method == 'PUT') {
+            return this.restart();
         } else if (method == 'DELETE') {
             return this.stop();
         } fi
