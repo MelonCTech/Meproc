@@ -1,5 +1,4 @@
-#include "@/../controllers/proc.m"
-#include "@/../controllers/index.m"
+#include "@/../controllers"
 
 sys = Import('sys');
 net = Import('net');
