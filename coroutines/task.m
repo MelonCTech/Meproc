@@ -1,4 +1,4 @@
-#include "@/log.m"
+#include "@/../utils/log.m"
 
 j = Import('json');
 s = Import('sys');

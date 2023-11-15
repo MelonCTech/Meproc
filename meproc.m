@@ -1,4 +1,4 @@
-#include "@/log.m"
+#include "@/utils/log.m"
 
 net = Import('net');
 mq = Import('mq');
@@ -10,10 +10,10 @@ if (!listenfd) {
     return;
 } fi
 
-Log('info', "Meproc v1.0.2. Listen on: " + Conf['ip'] + ':' + Conf['port']);
+Log('info', "Meproc v1.0.3. Listen on: " + Conf['ip'] + ':' + Conf['port']);
 
-Eval('@/http.m');
-Eval('@/bootstrap.m', nil, false, 'bootstrap');
+Eval('@/coroutines/http.m');
+Eval('@/coroutines/bootstrap.m', nil, false, 'bootstrap');
 
 while (1) {
     fd = net.tcp_accept(listenfd);

@@ -1,6 +1,6 @@
 #if !M_LOG
 #define M_LOG
-#include "@/conf/conf.m"
+#include "@/../conf/conf.m"
 
 Sys = Import('sys');
 F = Import('file');

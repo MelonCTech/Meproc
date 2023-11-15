@@ -1,5 +1,5 @@
-#include "@/log.m"
-#include "@/validator.m"
+#include "@/../utils/log.m"
+#include "@/../utils/validator.m"
 
 J = Import('json');
 S = Import('sys');
@@ -211,7 +211,7 @@ Proc {
 
     for (i = 0; i < n; ++i) {
         alias = name + ':' + i;
-        Eval('@/task.m', J.encode([
+        Eval('@/../coroutines/task.m', J.encode([
             'conf': prog,
             'alias': alias,
         ]), false, alias);

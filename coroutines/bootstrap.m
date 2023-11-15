@@ -1,4 +1,4 @@
-#include "@/log.m"
+#include "@/../utils/log.m"
 
 sys = Import('sys');
 

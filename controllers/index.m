@@ -1,4 +1,4 @@
-#include "@/conf/conf.m"
+#include "@/../conf/conf.m"
 
 F = Import('file');
 S = Import('sys');
@@ -12,7 +12,7 @@ Index {
     }
 
     @index() {
-        path = S.path('@/index.html');
+        path = S.path('@/../web/index.html');
         f = $F;
         if (!f.open(path, 'r')) {
             R['code'] = 404;
