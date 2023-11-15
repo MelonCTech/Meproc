@@ -1,4 +1,4 @@
-#include "@/../utils/log.m"
+#include "@/../utils/event.m"
 
 j = Import('json');
 s = Import('sys');
@@ -15,17 +15,10 @@ if (type == 'daemon') {
     s.msleep(interval);
 } fi
 
-s.exec(cmd, -1, pid, conf['user'], conf['group'], alias);
+process_start_event = data;
 
-msg = "Process " + pid + " (" + alias;
-if (conf['user'] || conf['group']) {
-    msg += " running as ";
-    conf['user'] && (msg += conf['user']);
-    msg += ':';
-    conf['group'] && (msg += conf['group']);
-} fi
-msg += ") exit";
-Log('info', msg);
+s.exec(cmd, -1, data['pid'], conf['user'], conf['group'], alias);
 
+process_stop_event = data;
 
 m.send('http', EVAL_DATA);

@@ -20,7 +20,7 @@ Proc {
 	        ['field': 'user', 'type': 'string', 'required': false,],
 	        ['field': 'group', 'type': 'string', 'required': false,],
                 ['field': 'replica', 'type': 'int', 'required': false, 'default': 1],
-                ['field': 'interval', 'type': 'int', 'required': false, 'default': 3],
+                ['field': 'interval', 'type': 'int', 'required': false, 'default': 3000],
                 ['field': 'deps', 'type': 'array', 'required': false, 'element_type': 'string', 'default': []],
             ],
             'args': [

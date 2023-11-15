@@ -14,15 +14,6 @@ while (1) {
         conf = d['conf'];
         name = conf['name'];
         if (Tasks[name]['type'] == 'daemon') {
-            msg = "Daemon Task " + name + " (" + d['alias'];
-            if (conf['user'] || conf['group']) {
-                msg += " running as ";
-                conf['user'] && (msg += conf['user']);
-                msg += ':';
-                conf['group'] && (msg += conf['group']);
-            } fi
-            msg += ") start";
-            Log('info', msg);
             Eval('@/../coroutines/task.m', data, false, d['alias']);
         } else {
             Tasks[name] && --(Tasks[name]['running']);
