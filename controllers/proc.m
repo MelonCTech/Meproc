@@ -110,6 +110,10 @@ Proc {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Invalid JSON field']);
         } fi
+        if (S.int(body['interval']) <= 0) {
+            R['code'] = 400;
+            return J.encode(['code': 400, 'msg': "Interval must be a positive integer'"]);
+        } fi
         if (S.int(body['replica']) <= 0) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': "Replica must be a positive integer'"]);

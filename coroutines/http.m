@@ -5,10 +5,29 @@ net = Import('net');
 mq = Import('mq');
 http = Import('http');
 str = Import('str');
+json = Import('json');
 
 while (1) {
     data = mq.recv('http', 1000);
-    !sys.is_nil(data) && Tasks[data] && --(Tasks[data]['running']);
+    if (!sys.is_nil(data)) {
+        d = json.decode(data);
+        conf = d['conf'];
+        name = conf['name'];
+        if (Tasks[name]['type'] == 'daemon') {
+            msg = "Daemon Task " + name + " (" + d['alias'];
+            if (conf['user'] || conf['group']) {
+                msg += " running as ";
+                conf['user'] && (msg += conf['user']);
+                msg += ':';
+                conf['group'] && (msg += conf['group']);
+            } fi
+            msg += ") start";
+            Log('info', msg);
+            Eval('@/../coroutines/task.m', data, false, d['alias']);
+        } else {
+            Tasks[name] && --(Tasks[name]['running']);
+        }
+    } fi
 
     cron_job_process();
 

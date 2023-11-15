@@ -345,18 +345,18 @@
       $('#submitbtn').on('click', function(ev) {
         ev.preventDefault();
         $('#tips').css('display', 'none')
-        var type = $('#ttype').val()
+        var type = $('#ttype').val().trim()
         var data = {
-          name: $('#tname').val(),
-          cmd: $('#tcmd').val(),
+          name: $('#tname').val().trim(),
+          cmd: $('#tcmd').val().trim(),
           type: type,
-          replica: parseInt($('#treplica').val()),
+          replica: parseInt($('#treplica').val().trim()),
         }
-        if ($('#tuser').val()) data.user = $('#tuser').val()
-        if ($('#tgrp').val()) data.group = $('#tgrp').val()
+        if ($('#tuser').val()) data.user = $('#tuser').val().trim()
+        if ($('#tgrp').val()) data.group = $('#tgrp').val().trim()
         if ($('#tdep').val()) data.deps = $('#tdep').val()
-        if (type == 'daemon' && $('#tinterval').val()) data.interval = $('#tinterval').val()
-        if (type == 'cron' && $('#tcron').val()) data.cron = $('#tcron').val()
+        if (type == 'daemon' && $('#tinterval').val().trim()) data.interval = $('#tinterval').val().trim()
+        if (type == 'cron' && $('#tcron').val().trim()) data.cron = $('#tcron').val().trim()
         $.ajax({
           url: "http://{{IP}}:{{PORT}}/proc",
           type: "POST",

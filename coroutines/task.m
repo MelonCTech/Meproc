@@ -11,7 +11,9 @@ type = conf['type'];
 cmd = conf['cmd'];
 interval = conf['interval'];
 
-again:
+if (type == 'daemon') {
+    s.msleep(interval);
+} fi
 
 s.exec(cmd, -1, pid, conf['user'], conf['group'], alias);
 
@@ -25,9 +27,5 @@ if (conf['user'] || conf['group']) {
 msg += ") exit";
 Log('info', msg);
 
-if (type == 'daemon') {
-    s.msleep(interval);
-    goto again;
-} fi
 
-m.send('http', conf['name']);
+m.send('http', EVAL_DATA);

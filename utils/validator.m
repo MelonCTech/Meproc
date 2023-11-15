@@ -25,7 +25,7 @@ S = Import('sys');
                 continue;
             fi
         } else {
-            if (!sys.has(data, r['field'])) {
+            if (!sys.has(data, r['field']) || ((sys.is_str(data[r['field']]) || sys.is_array(data[r['field']])) && !data[r['field']])) {
                 return false;
             } fi
         }
