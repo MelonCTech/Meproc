@@ -276,11 +276,12 @@
               placement: "top",
             })
             btn.on('click', function() {
+              var _name = $(this).attr('id').split('-')[1]
               $.ajax({
-                url: 'http://{{IP}}:{{PORT}}/proc?name=' + name,
+                url: 'http://{{IP}}:{{PORT}}/proc?name=' + _name,
                 type: 'DELETE',
                 success: function(result) {
-                  var b = $('#rm-'+name)
+                  var b = $('#rm-'+_name)
                   b.popover('show');
                   setTimeout(function() {
                     b.popover('hide');
@@ -302,11 +303,12 @@
               placement: "top",
             })
             btn.on('click', function() {
+              var _name = $(this).attr('id').split('-')[1]
               $.ajax({
-                url: "http://{{IP}}:{{PORT}}/proc?name=" + name,
+                url: "http://{{IP}}:{{PORT}}/proc?name=" + _name,
                 type: "PUT",
                 success: function(response) {
-                  var b = $('#rerun-'+name)
+                  var b = $('#rerun-'+_name)
                   b.popover('show');
                   setTimeout(function() {
                     b.popover('hide');
