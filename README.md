@@ -33,6 +33,8 @@ You can pull the built docker image.
 docker pull melonc/meproc
 ```
 
+You can refer to the [Wiki](https://github.com/MelonCTech/Meproc/wiki) for more installation approaches.
+
 
 
 ## Quick Start
@@ -176,34 +178,42 @@ curl -v -XPOST http://127.1:8606/proc -d '{"name": "sleep4", "cmd": "sleep 5", "
 We will see the output of Meproc like:
 
 ```
-11/01/2023 10:28:28 UTC [INFO]: Listen: 127.0.0.1:8606
-11/01/2023 10:28:31 UTC [INFO]: Task sleep1 started
-11/01/2023 10:28:31 UTC [INFO]: Task sleep1 stopped
-11/01/2023 10:28:31 UTC [INFO]: Task sleep2 started
-11/01/2023 10:28:32 UTC [INFO]: Task sleep1 started
-11/01/2023 10:28:32 UTC [INFO]: Task sleep1 stopped
-11/01/2023 10:28:32 UTC [INFO]: Task sleep1 started
-11/01/2023 10:28:37 UTC [INFO]: Process 1533616 (sleep2:1) exit
-11/01/2023 10:28:37 UTC [INFO]: Process 1533615 (sleep2:0) exit
-11/01/2023 10:28:37 UTC [INFO]: Process 1533626 (sleep1:1) exit
-11/01/2023 10:28:37 UTC [INFO]: Process 1533624 (sleep1:0) exit
-11/01/2023 10:28:37 UTC [INFO]: Task sleep3 started
-11/01/2023 10:28:42 UTC [INFO]: Process 1533685 (sleep3:0) exit
-11/01/2023 10:28:42 UTC [INFO]: Process 1533686 (sleep3:1) exit
-11/01/2023 10:28:45 UTC [INFO]: Task sleep4 started
-11/01/2023 10:28:50 UTC [INFO]: Process 1533747 (sleep4:0) exit
-11/01/2023 10:28:50 UTC [INFO]: Process 1533748 (sleep4:1) exit
-11/01/2023 10:30:00 UTC [INFO]: Task sleep4 started
-11/01/2023 10:30:05 UTC [INFO]: Process 1534633 (sleep4:0) exit
-11/01/2023 10:30:05 UTC [INFO]: Process 1534634 (sleep4:1) exit
-11/01/2023 10:30:20 UTC [INFO]: Task sleep4 stopped
-11/01/2023 10:30:20 UTC [INFO]: Task sleep4 started
-11/01/2023 10:30:25 UTC [INFO]: Process 1534878 (sleep4:0) exit
-11/01/2023 10:30:25 UTC [INFO]: Process 1534879 (sleep4:1) exit
-11/01/2023 10:30:32 UTC [INFO]: Task sleep4 stopped
-11/01/2023 10:30:32 UTC [INFO]: Task sleep4 started
-11/01/2023 10:30:37 UTC [INFO]: Process 1534999 (sleep4:0) exit
-11/01/2023 10:30:37 UTC [INFO]: Process 1535000 (sleep4:1) exit
+11/16/2023 15:22:38 UTC [INFO]: Meproc v1.0.6. Listen on: 0.0.0.0:8606
+11/16/2023 15:22:43 UTC [INFO]: Task sleep1 started
+11/16/2023 15:22:43 UTC [INFO]: Once Process (sleep1:0) start
+11/16/2023 15:22:43 UTC [INFO]: Once Process (sleep1:1) start
+11/16/2023 15:22:45 UTC [INFO]: Task sleep4 started
+11/16/2023 15:22:45 UTC [INFO]: Cron Process (sleep4:0) start
+11/16/2023 15:22:45 UTC [INFO]: Cron Process (sleep4:1) start
+11/16/2023 15:22:48 UTC [INFO]: Once Process 47509 (sleep1:1) stop
+11/16/2023 15:22:48 UTC [INFO]: Once Process 47507 (sleep1:0) stop
+11/16/2023 15:22:48 UTC [INFO]: Task sleep2 started
+11/16/2023 15:22:48 UTC [INFO]: Once Process (sleep2:0) start
+11/16/2023 15:22:48 UTC [INFO]: Once Process (sleep2:1) start
+11/16/2023 15:22:50 UTC [INFO]: Cron Process 47516 (sleep4:0) stop
+11/16/2023 15:22:50 UTC [INFO]: Cron Process 47517 (sleep4:1) stop
+11/16/2023 15:22:53 UTC [INFO]: Once Process 47518 (sleep2:0) stop
+11/16/2023 15:22:53 UTC [INFO]: Once Process 47519 (sleep2:1) stop
+11/16/2023 15:22:54 UTC [INFO]: Task sleep3 started
+11/16/2023 15:22:54 UTC [INFO]: Once Process (sleep3:0) start
+11/16/2023 15:22:54 UTC [INFO]: Once Process (sleep3:1) start
+11/16/2023 15:22:59 UTC [INFO]: Once Process 47521 (sleep3:1) stop
+11/16/2023 15:22:59 UTC [INFO]: Once Process 47520 (sleep3:0) stop
+11/16/2023 15:24:00 UTC [INFO]: Task sleep4 started
+11/16/2023 15:24:00 UTC [INFO]: Cron Process (sleep4:0) start
+11/16/2023 15:24:00 UTC [INFO]: Cron Process (sleep4:1) start
+11/16/2023 15:24:05 UTC [INFO]: Cron Process 47524 (sleep4:0) stop
+11/16/2023 15:24:05 UTC [INFO]: Cron Process 47525 (sleep4:1) stop
+11/16/2023 15:25:00 UTC [INFO]: Task sleep4 started
+11/16/2023 15:25:00 UTC [INFO]: Cron Process (sleep4:0) start
+11/16/2023 15:25:00 UTC [INFO]: Cron Process (sleep4:1) start
+11/16/2023 15:25:05 UTC [INFO]: Cron Process 47527 (sleep4:1) stop
+11/16/2023 15:25:05 UTC [INFO]: Cron Process 47526 (sleep4:0) stop
+11/16/2023 15:26:00 UTC [INFO]: Task sleep4 started
+11/16/2023 15:26:00 UTC [INFO]: Cron Process (sleep4:0) start
+11/16/2023 15:26:00 UTC [INFO]: Cron Process (sleep4:1) start
+11/16/2023 15:26:05 UTC [INFO]: Cron Process 47528 (sleep4:0) stop
+11/16/2023 15:26:05 UTC [INFO]: Cron Process 47529 (sleep4:1) stop
 ...
 ```
 
