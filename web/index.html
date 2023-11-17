@@ -140,15 +140,67 @@
       color: red;
       display: none;
     }
+    .details-row {
+      display: none;
+    }
   </style>
 
   <script>
+    function build_running_tasks(running) {
+      var ret = []
+      for (var i = 0; i < running.length; ++i) {
+        var name = running[i].alias.split(':')[0]
+        if (ret[name] === undefined)
+          ret[name] = []
+        ret[name].push(running[i])
+      }
+      return ret
+    }
+    function render_task_details(root, running) {
+      var tbl = $('<table>')
+      root.append(tbl)
+      tbl.css('width', '100%')
+      var th = $('<thead>')
+      tbl.append(th)
+      var tr = $('<tr>')
+      th.append(tr)
+      th = $('<th>')
+      tr.append(th)
+      th.text('Alias')
+      th = $('<th>')
+      tr.append(th)
+      th.text('Command')
+      th = $('<th>')
+      tr.append(th)
+      th.text('PID')
+
+      var tb = $('<tbody>')
+      tbl.append(tb);
+      for (var i = 0; i < running.length; ++i) {
+          var tr = $('<tr>')
+          tb.append(tr)
+
+          var td = $('<td>')
+          tr.append(td)
+          td.text(running[i].alias)
+
+          td = $('<td>')
+          tr.append(td)
+          td.text(running[i].command)
+
+          td = $('<td>')
+          tr.append(td)
+          td.text(running[i].pid)
+      }
+    }
+
     window.onload = function() {
       $.ajax({
         url: "http://{{IP}}:{{PORT}}/proc",
         method: "GET",
         success: function(response) {
           var res = []
+          var running = build_running_tasks(response.data.running)
           var tasks = response.data.tasks
           var keys = Object.keys(tasks)
           for (i = 0; i < keys.length; ++i) {
@@ -317,6 +369,22 @@
                 }
               });
             })
+
+            dtr = $('<tr>')
+            dtr.attr('class', 'details-row')
+            tb.append(dtr)
+            td = $('<td>')
+            td.attr('colspan', 12)
+            dtr.append(td)
+            if (running[name] !== undefined) {
+              render_task_details(td, running[name])
+              tr.hover(function () {
+                $('.table tbody .details-row').hide();
+                $(this).next('.details-row').show();
+              }, function () {
+                $('.table tbody .details-row').hide();
+              })
+            }
           }
 
           $('#content').append(div);
@@ -357,7 +425,7 @@
         if ($('#tuser').val()) data.user = $('#tuser').val().trim()
         if ($('#tgrp').val()) data.group = $('#tgrp').val().trim()
         if ($('#tdep').val()) data.deps = $('#tdep').val()
-        if (type == 'daemon' && $('#tinterval').val().trim()) data.interval = $('#tinterval').val().trim()
+        if (type == 'daemon' && $('#tinterval').val().trim()) data.interval = parseInt($('#tinterval').val().trim())
         if (type == 'cron' && $('#tcron').val().trim()) data.cron = $('#tcron').val().trim()
         $.ajax({
           url: "http://{{IP}}:{{PORT}}/proc",
