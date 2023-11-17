@@ -3,6 +3,7 @@
 #include "@/../conf/conf.m"
 
 Sys = Import('sys');
+Str = Import('str');
 F = Import('file');
 
 Log_path = '/tmp/Meproc.log';
@@ -48,28 +49,33 @@ Log_level = 'debug';
     }
 
     f = $F;
-    if (f.open(Log_path, 'a+')) {
+    tm = Str.slice(Str.slice(tm, ' ')[0], '/');
+    path = Conf['log_dir'] + '/' + Log_path + '-' + tm[2] + '-' + tm[0] + '-' + tm[1] + '.log';
+    if (f.open(path, 'a+')) {
         f.write(l + s + "\n");
         f.close();
     } else {
-        Sys.print("Open log file [" + Log_path + "] failed, " + f.errmsg());
+        Sys.print("Open log file [" + path + "] failed, " + f.errmsg());
     }
     Sys.print(lc + s);
 }
 
 @TaskLog(alias, s)
 {
+    tm = Sys.utctime(Sys.time());
+    tm = Str.slice(Str.slice(tm, ' ')[0], '/');
+    path = Conf['log_dir'] + '/' + alias + '-' + tm[2] + '-' + tm[0] + '-' + tm[1] + '.log';
     f = $F;
-    if (f.open(Conf['log_dir'] + '/' + alias + '.log', 'a+')) {
+    if (f.open(path, 'a+')) {
         f.write(s);
         f.close();
     } else {
-        Sys.print("Open log file [" + Conf['log_dir'] + '/' + alias + '.log' + "] failed, " + f.errmsg());
+        Sys.print("Open log file [" + path + "] failed, " + f.errmsg());
     }
 }
 
 Log_level_set(Conf['log_level']);
-Log_path_set(Conf['log_dir'] + '/Meproc.log');
+Log_path_set('Meproc');
 
 /*
  * Examples:
