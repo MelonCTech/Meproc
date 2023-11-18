@@ -74,6 +74,19 @@ Log_level = 'debug';
     }
 }
 
+@GetLogContent(alias)
+{
+    tm = Sys.utctime(Sys.time());
+    tm = Str.slice(Str.slice(tm, ' ')[0], '/');
+    path = Conf['log_dir'] + '/' + alias + '-' + tm[2] + '-' + tm[0] + '-' + tm[1] + '.log';
+    f = $F;
+    if (f.open(path, 'r')) {
+        ret = f.read(f.size());
+        f.close();
+    } fi
+    return ret;
+}
+
 Log_level_set(Conf['log_level']);
 Log_path_set('Meproc');
 

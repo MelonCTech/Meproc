@@ -15,6 +15,13 @@
     <div id="content">
     </div>
     <button id="new" class="btn btn-success">New</button>
+    <div id="outputModal" class="modal">
+      <div class="modal-content">
+        <span class="close" style="padding:5px">&times;</span>
+        <h2 style="padding:8px 20px">Output</h2>
+        <p style="padding:8px 20px" id="outputContent"></p>
+      </div>
+    </div>
     <div id="formModal" class="modal">
       <div class="modal-content">
         <span class="close" style="padding:5px">&times;</span>
@@ -117,7 +124,7 @@
       margin: 15% auto;
       padding: 20px;
       border: 1px solid #888;
-      width: 40%;
+      width: 50%;
       bottom: 8%;
     }
     .modal-content form {
@@ -142,6 +149,14 @@
     }
     .details-row {
       display: none;
+    }
+    code {
+      background-color: #f4f4f4;
+      padding: 5px;
+      display: block;
+    }
+    .outputClass {
+      padding: 5px;
     }
   </style>
 
@@ -370,6 +385,41 @@
               });
             })
 
+            btn = $('<button>')
+            td.append(btn)
+            btn.attr('id', 'output-' + name)
+            btn.attr('class', 'btn btn-secondary')
+            btn.text('Output')
+            btn.on('click', function() {
+              var _name = $(this).attr('id').split('-')[1]
+              $.ajax({
+                url: "http://{{IP}}:{{PORT}}/proc/output?name=" + _name,
+                type: "GET",
+                success: function(response) {
+                  $.each(response.data, function (k, v) {
+                    var l = $('<h5>')
+                    l.text(k)
+                    l.css('display', 'block')
+                    l.attr('class', 'outputClass')
+                    $('#outputContent').append(l)
+                    var p = $('<code>')
+                    if (!v) {
+                      p.html('')
+                    } else {
+                      p.html(atob(v).replace(/\n/g, '<br>'))
+                    }
+                    p.attr('class', 'outputClass')
+                    $('#outputContent').append(p)
+                  })
+                  $('#outputModal').css('display', 'block')
+                },
+                error: function(xhr, status, error) {
+                  $('#outputModal').css('display', 'block')
+                  $('#outputContent').text(error)
+                }
+              })
+            })
+
             dtr = $('<tr>')
             dtr.attr('class', 'details-row')
             tb.append(dtr)
@@ -399,11 +449,14 @@
         $("#formModal").css("display", "block");
       })
       $(".close").click(function(){
-        $("#formModal").css("display", "none");
+        $(this).closest('.modal').css("display", "none")
       });
       $(window).click(function(event) {
         if (event.target == $("#formModal")[0]) {
           $("#formModal").css("display", "none");
+        }
+        if (event.target == $("#outputModal")[0]) {
+          $("#outputModal").css("display", "none");
         }
       });
 

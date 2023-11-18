@@ -5,6 +5,7 @@ J = Import('json');
 S = Import('sys');
 Str = Import('str');
 Mq = Import('mq');
+B = Import('base64');
 
 Tasks = [];
 Delta = 0;
@@ -32,6 +33,7 @@ Proc {
     @acl() {
         return [
             'index': true,
+            'output': true,
         ];
     }
 
@@ -59,6 +61,28 @@ Proc {
             return nil;
         fi
         return J.decode(R['body']);
+    }
+
+    @output() {
+        R['headers']['Content-Type'] = 'application/json';
+        args = this.get_args();
+        if (!Validate(this.rules()['args'], args)) {
+            R['code'] = 400;
+            return J.encode(['code': 400, 'msg': 'name is required']);
+        } fi
+        name = args['name'];
+        if (!S.has(Tasks, name) || S.is_nil(Tasks[name])) {
+            R['code'] = 403;
+            return J.encode(['code': 403, 'msg': 'Program not exists, please start it at first']);
+        } fi
+        data = [];
+        n = Tasks[name]['replica'];
+        for (i = 0; i < n; ++i) {
+            alias = name + ':' + i;
+            content = GetLogContent(alias);
+            data[alias] = content && B.base64(content, 'encode') || '';
+        }
+        return J.encode(['code': 200, 'msg': 'OK', 'data': data]);
     }
 
     @index() {
