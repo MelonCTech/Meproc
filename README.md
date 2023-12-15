@@ -65,12 +65,15 @@ Using a POST HTTP request to start up a new process.
 
 `name` is the task name. One task is a group of same processes. In this example, we will start up two process to run `sleep 5`.
 
-`once` means that the processes in this task will only be executed once. And there are three values of `type` field:
+`once` means that the processes in this task will only be executed once. And there are four values of `type` field:
 
 - `once` means this task will only be executed once even if it exits unexpectedly.
 - `daemon` means this task is a daemon, so if this process exits in any reason, it will be restarted.
 - `cron` means this task is a cron job, it will contain a field named `cron` in task JSON.
-- `user` indicates the user of the new process. Please make sure that Meproc has the permission to do this. `user` and `group` are NOT working on Windows.
+- `coroutine` means that this task is a melang coroutine task. It will start a melang coroutine based on the provided script file path.
+
+
+`user` indicates the user of the new process. Please make sure that Meproc has the permission to do this. `user` and `group` are NOT working on Windows.
 
 
 

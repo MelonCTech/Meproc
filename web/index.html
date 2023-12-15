@@ -37,6 +37,7 @@
             <option value="once">once</option>
             <option value="daemon">daemon</option>
             <option value="cron">cron</option>
+            <option value="coroutine">coroutine</option>
           </select><br><br>
           <div id="interval-box">
             <label for="tinterval">Interval:</label>
@@ -494,7 +495,8 @@
             }, 2000);
           },
           error: function(xhr, status, error) {
-            $('#tips').text(error)
+            var e = JSON.parse(xhr.responseText)
+            $('#tips').text(e.msg)
             $('#tips').css('display', 'block')
             $('#tips').css('color', 'red')
           }

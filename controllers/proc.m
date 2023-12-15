@@ -16,7 +16,7 @@ Proc {
             'body': [
                 ['field': 'name', 'type': 'string', 'required': true],
                 ['field': 'cmd', 'type': 'string', 'required': true],
-                ['field': 'type', 'type': 'string', 'required': true, 'in': ['once', 'daemon', 'cron']],
+                ['field': 'type', 'type': 'string', 'required': true, 'in': ['once', 'daemon', 'cron', 'coroutine']],
 	        ['field': 'cron', 'type': 'string', 'required': false, 'default': '* * * * *'],
 	        ['field': 'user', 'type': 'string', 'required': false,],
 	        ['field': 'group', 'type': 'string', 'required': false,],
@@ -112,8 +112,18 @@ Proc {
             fi
             data[keys[i]] = Tasks[keys[i]];
         }
+        co = Eval();
+        run = S.exec();
+        n = S.size(co);
+        for (i = 0; i < n; ++i) {
+            run[] = [
+                'command': '',
+                'pid': '',
+                'alias': co[i],
+            ];
+        }
         return J.encode(['code': 200, 'msg': 'OK', 'data': [
-            'running': S.exec(),
+            'running': run,
             'tasks': data,
         ]]);
     }
@@ -133,6 +143,10 @@ Proc {
         if (!Validate(this.rules()['body'], body)) {
             R['code'] = 400;
             return J.encode(['code': 400, 'msg': 'Invalid JSON field']);
+        } fi
+        if (body['name'] == '__coroutine__') {
+            R['code'] = 400;
+            return J.encode(['code': 400, 'msg': "name '" + body['name'] + "' is reserved"]);
         } fi
         if (S.int(body['interval']) <= 0) {
             R['code'] = 400;
@@ -256,6 +270,9 @@ Proc {
     Log('info', 'Task ' + prog['name'] + ' stopped');
     for (i = 0; i < n; ++i) {
         Kill(name + ':' + i);
+        if (prog['type'] == 'coroutine') {
+            Kill('__' + prog['type'] + '__:' + name + ':' + i);
+        } fi
     }
 }
 
